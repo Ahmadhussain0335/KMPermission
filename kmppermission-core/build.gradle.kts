@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -19,6 +20,9 @@ kotlin {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 
+    // Also packaged as an XCFramework for the Swift Package (Package.swift) used by Swift-only apps:
+    // ./gradlew :kmppermission-core:assembleKMPPermissionCoreReleaseXCFramework
+    val xcFramework = XCFramework("KMPPermissionCore")
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -26,6 +30,8 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "KMPPermissionCore"
             isStatic = true
+            binaryOption("bundleId", "io.github.ahmadhussain0335.kmppermission.core")
+            xcFramework.add(this)
         }
     }
 

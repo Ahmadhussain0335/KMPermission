@@ -21,3 +21,7 @@ node_modules/
 # Claude Code local state
 .claude/settings.local.json
 .claude/*.lock
+
+# Swift Package Manager
+.build/
+.swiftpm/

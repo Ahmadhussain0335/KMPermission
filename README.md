@@ -41,6 +41,23 @@ kotlin {
 
 Android-only apps can use the same coordinates in `dependencies { }`; Gradle picks the Android artifact.
 
+### Swift Package Manager (Swift-only iOS apps)
+
+iOS apps that don't use Kotlin can add the core library as a Swift package. In Xcode choose File, then Add Package Dependencies, enter `https://github.com/Ahmadhussain0335/KMPermission`, and add the `KMPPermissionCore` product. Or in `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/Ahmadhussain0335/KMPermission", from: "0.2.1"),
+],
+targets: [
+    .target(name: "YourApp", dependencies: [
+        .product(name: "KMPPermissionCore", package: "KMPermission"),
+    ]),
+]
+```
+
+The package is a prebuilt static XCFramework for iOS 15+ (device and Apple-silicon simulator) attached to each GitHub release. Swift packages are available from 0.2.1. The Compose layer is not included.
+
 ## Statuses
 
 | Status | Meaning |
@@ -192,24 +209,31 @@ Known limitations:
 - A request still waiting when its Android Activity is destroyed is cancelled (`CancellationException`), not resumed.
 
 Planned:
-- An XCFramework or Swift package for Swift-only iOS apps.
 - An instrumented Android UI test suite matching the iOS one, plus Compose and Robolectric tests.
 - A Compose sample for iOS.
 
 ## Releasing
 
-Pushing a tag `vX.Y.Z` runs `.github/workflows/publish.yml` on macOS. It runs the tests and the ABI check, then signs and uploads the version from the tag to Maven Central. The deployment then waits in the [Central Portal](https://central.sonatype.com/publishing/deployments) for a manual Publish.
+Releases are made from `main` by running the **Release** workflow (Actions, then Release, then Run workflow) with a version such as `0.2.1`. On macOS it:
 
-Before the first release, the repository needs these Actions secrets (Settings, then Secrets and variables, then Actions):
+1. Runs the tests and the ABI check.
+2. Builds the iOS XCFramework, zips it, and writes `Package.swift` with that zip's checksum.
+3. Signs and uploads the Maven artifacts to the Central Portal.
+4. Pushes a `release: X.Y.Z` commit with `Package.swift`, and the tag `vX.Y.Z`.
+5. Creates the GitHub release with the XCFramework zip attached.
+
+The Maven deployment then waits in the [Central Portal](https://central.sonatype.com/publishing/deployments) for a manual Publish. Pushing a tag by hand does not release anything.
+
+The workflow needs these Actions secrets (Settings, then Secrets and variables, then Actions):
 
 | Secret | Value |
 |---|---|
 | `MAVEN_CENTRAL_USERNAME` | User token username from the Central Portal (Account, then Generate User Token) |
 | `MAVEN_CENTRAL_PASSWORD` | User token password |
-| `SIGNING_KEY` | ASCII-armored GPG private key (`gpg --export-secret-keys --armor <key id>`) |
+| `SIGNING_KEY` | ASCII-armored OpenPGP private key used to sign the artifacts |
 | `SIGNING_KEY_PASSWORD` | Passphrase of that key |
 
-The public half of the key must be uploaded to a keyserver such as `keys.openpgp.org` so Maven Central can verify the signatures. Secrets never go into the repository or `gradle.properties`.
+The public half of the signing key (ID `8AC823762AD980EB`) is on `keyserver.ubuntu.com` and `keys.openpgp.org`, where Maven Central verifies the signatures. Secrets never go into the repository or `gradle.properties`.
 
 ## License
 

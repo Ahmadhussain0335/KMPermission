@@ -69,7 +69,7 @@ jobs:
           path: ~/.konan
           key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
 
-      - name: Common tests on the iOS simulator, ABI check, iOS compile and framework link
+      - name: Common tests on the iOS simulator, ABI check, iOS compile and XCFramework
         run: >
           ./gradlew
           :kmppermission-core:iosSimulatorArm64Test
@@ -77,7 +77,7 @@ jobs:
           :kmppermission-compose:checkKotlinAbi
           :kmppermission-compose:compileKotlinIosArm64
           :kmppermission-compose:compileKotlinIosSimulatorArm64
-          :kmppermission-core:linkDebugFrameworkIosArm64
+          :kmppermission-core:assembleKMPPermissionCoreReleaseXCFramework
 
       # Builds the sample and its device UI tests. The tests themselves need a physical device and
       # answer real permission prompts, so they are run locally (see README).

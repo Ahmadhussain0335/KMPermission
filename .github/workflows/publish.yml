@@ -1,25 +1,55 @@
-name: Publish
+name: Release
 
-# Pushing a tag such as v0.2.0 publishes that version to Maven Central.
+# Run manually (Actions > Release > Run workflow) with a version such as 0.2.1. It verifies main, builds
+# the iOS XCFramework, writes Package.swift with that zip's checksum, uploads the Maven artifacts,
+# pushes the release commit and tag, and creates the GitHub release with the zip attached.
+# The Maven deployment then waits in the Central Portal for a manual Publish.
 on:
-  push:
-    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (X.Y.Z or X.Y.Z-suffix, no leading v)
+        required: true
 
+# Writes the release commit, tag and GitHub release.
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: publish
+  group: release
   cancel-in-progress: false
 
 jobs:
-  publish:
-    name: Publish to Maven Central
-    # macOS is required to build the iOS klibs.
+  release:
+    name: Release ${{ inputs.version }}
+    # macOS is required to build the iOS klibs and the XCFramework.
     runs-on: macos-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
+    env:
+      VERSION: ${{ inputs.version }}
+      ORG_GRADLE_PROJECT_VERSION_NAME: ${{ inputs.version }}
     steps:
+      - name: Check inputs
+        run: |
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "Releases are made from main, not $GITHUB_REF." >&2
+            exit 1
+          fi
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || [[ "$VERSION" == *SNAPSHOT* ]]; then
+            echo "$VERSION is not a release version (expected X.Y.Z or X.Y.Z-suffix)." >&2
+            exit 1
+          fi
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Check the tag is new
+        run: |
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "Tag v$VERSION already exists." >&2
+            exit 1
+          fi
 
       - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
@@ -33,16 +63,7 @@ jobs:
           path: ~/.konan
           key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
 
-      - name: Derive the version from the tag
-        run: |
-          version="${GITHUB_REF_NAME#v}"
-          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || [[ "$version" == *SNAPSHOT* ]]; then
-            echo "Tag $GITHUB_REF_NAME is not a release version (expected vX.Y.Z or vX.Y.Z-suffix)." >&2
-            exit 1
-          fi
-          echo "ORG_GRADLE_PROJECT_VERSION_NAME=$version" >> "$GITHUB_ENV"
-
-      - name: Verify before publishing
+      - name: Verify
         run: >
           ./gradlew
           :kmppermission-core:testAndroidHostTest
@@ -50,8 +71,28 @@ jobs:
           :kmppermission-core:checkKotlinAbi
           :kmppermission-compose:checkKotlinAbi
 
-      # Uploads and validates the deployment. It then waits in the Central Portal for a manual
-      # "Publish"; switch to publishAndReleaseToMavenCentral to release automatically.
+      - name: Build the XCFramework and Package.swift
+        run: |
+          ./gradlew :kmppermission-core:assembleKMPPermissionCoreReleaseXCFramework
+          mkdir -p build/release
+          ditto -c -k --sequesterRsrc --keepParent \
+            kmppermission-core/build/XCFrameworks/release/KMPPermissionCore.xcframework \
+            build/release/KMPPermissionCore.xcframework.zip
+          checksum="$(swift package compute-checksum build/release/KMPPermissionCore.xcframework.zip)"
+          scripts/write-package-swift.sh "$VERSION" "$checksum"
+          swift package dump-package > /dev/null
+          echo "XCFramework checksum: $checksum"
+
+      - name: Commit the release locally
+        run: |
+          git config user.name "Ahmad Hussain"
+          git config user.email "ahmadhussain0335@gmail.com"
+          git add Package.swift
+          git commit -m "release: $VERSION"
+          git tag -a "v$VERSION" -m "KMPermission $VERSION"
+
+      # Uploads first, so a failed upload leaves no tag behind; the deployment stays unpublished in
+      # the Central Portal until it is released there by hand.
       - name: Sign and upload to Maven Central
         run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:
@@ -59,3 +100,16 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+      # Fails if main moved since the run started, rather than overwriting anything.
+      - name: Push the release commit and tag
+        run: git push origin HEAD:main "v$VERSION"
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "v$VERSION" build/release/KMPPermissionCore.xcframework.zip
+          --title "KMPermission $VERSION"
+          --generate-notes
+          --latest
