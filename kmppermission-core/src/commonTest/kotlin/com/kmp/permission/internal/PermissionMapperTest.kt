@@ -66,4 +66,11 @@ class PermissionMapperTest {
             PermissionMapper.iosInfoPlistKeys(Permission.LocationBackground, iosMajorVersion = 18),
         )
     }
+
+    @Test
+    fun stableIds_areUnique() {
+        val ids = PermissionMapper.allPermissions.map(PermissionMapper::stableId)
+
+        assertEquals(ids.size, ids.toSet().size)
+    }
 }

@@ -102,7 +102,6 @@ internal actual class PermissionController actual constructor() : PermissionEngi
         autoGranted.forEach { results[it] = PermissionStatus.Granted }
 
         if (needsPrompt.isNotEmpty()) {
-            needsPrompt.forEach { activeHost.requestedStore.markRequested(it) }
             val manifestPermissions = needsPrompt
                 .flatMap { AndroidPermissionMapper.manifestPermissions(it) }
                 .distinct()
@@ -110,7 +109,7 @@ internal actual class PermissionController actual constructor() : PermissionEngi
 
             requestMutex.withLock { launchAndAwait(activeHost, manifestPermissions) }
 
-            needsPrompt.forEach { results[it] = activeHost.resolver.resolve(it, activeHost.activity) }
+            needsPrompt.forEach { results[it] = activeHost.resolver.resolveAfterRequest(it, activeHost.activity) }
         }
 
         return results

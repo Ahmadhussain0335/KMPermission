@@ -32,6 +32,29 @@ internal object PermissionMapper {
         Permission.SpeechRecognition,
     )
 
+    /**
+     * A persistence-safe identifier for [permission]. Class names are not used for this because R8
+     * may rename them in a consumer's release build.
+     */
+    fun stableId(permission: Permission): String = when (permission) {
+        Permission.Camera -> "camera"
+        Permission.Microphone -> "microphone"
+        Permission.Bluetooth -> "bluetooth"
+        Permission.BluetoothScan -> "bluetooth_scan"
+        Permission.BluetoothConnect -> "bluetooth_connect"
+        Permission.LocationFine -> "location_fine"
+        Permission.LocationCoarse -> "location_coarse"
+        Permission.LocationBackground -> "location_background"
+        Permission.Notifications -> "notifications"
+        Permission.Contacts -> "contacts"
+        Permission.Calendar -> "calendar"
+        Permission.Storage -> "storage"
+        Permission.Photos -> "photos"
+        Permission.Nfc -> "nfc"
+        Permission.Motion -> "motion"
+        Permission.SpeechRecognition -> "speech_recognition"
+    }
+
     /** The platforms [permission] exists on at all. */
     fun supportedPlatforms(permission: Permission): Set<Platform> = when (permission) {
         Permission.Nfc, Permission.Storage -> setOf(Platform.Android)

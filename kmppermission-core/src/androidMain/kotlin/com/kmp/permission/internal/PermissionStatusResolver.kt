@@ -9,8 +9,8 @@ import com.kmp.permission.PermissionStatus
 
 /**
  * Derives a [PermissionStatus] from the OS's current grant state plus [RequestedPermissionsStore]'s
- * memory of whether the permission was ever asked for — the shared logic behind both
- * [PermissionController.status] and its post-request result mapping.
+ * history — the shared logic behind both [PermissionController.status] and its post-request result
+ * mapping. See [AndroidStatusRules] for the decision itself.
  */
 internal class PermissionStatusResolver(
     private val context: Context,
@@ -20,16 +20,30 @@ internal class PermissionStatusResolver(
     fun resolve(permission: Permission, activity: ComponentActivity?): PermissionStatus {
         if (AndroidPermissionMapper.isAutoGrantedBelowRuntime(permission)) return PermissionStatus.Granted
 
-        val manifestPermissions = AndroidPermissionMapper.manifestPermissions(permission)
-        val allGranted = manifestPermissions.all {
+        val granted = isGranted(permission)
+        val canShowRationale = canShowRationale(permission, activity)
+        val history = AndroidStatusRules.observed(granted, canShowRationale, requestedStore.history(permission))
+        requestedStore.save(permission, history)
+        return AndroidStatusRules.status(granted, canShowRationale, history)
+    }
+
+    /** Records that a request for [permission] just completed, then resolves its status. */
+    fun resolveAfterRequest(permission: Permission, activity: ComponentActivity): PermissionStatus {
+        if (AndroidPermissionMapper.isAutoGrantedBelowRuntime(permission)) return PermissionStatus.Granted
+
+        val granted = isGranted(permission)
+        val canShowRationale = canShowRationale(permission, activity)
+        val history = AndroidStatusRules.afterRequest(granted, canShowRationale, requestedStore.history(permission))
+        requestedStore.save(permission, history)
+        return AndroidStatusRules.status(granted, canShowRationale, history)
+    }
+
+    private fun isGranted(permission: Permission): Boolean =
+        AndroidPermissionMapper.manifestPermissions(permission).all {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
-        if (allGranted) return PermissionStatus.Granted
 
-        if (!requestedStore.wasRequested(permission)) return PermissionStatus.NotDetermined
-
-        val canShowRationale = activity != null &&
-            manifestPermissions.any { activity.shouldShowRequestPermissionRationale(it) }
-        return if (canShowRationale) PermissionStatus.Denied else PermissionStatus.PermanentlyDenied
-    }
+    private fun canShowRationale(permission: Permission, activity: ComponentActivity?): Boolean =
+        activity != null &&
+            AndroidPermissionMapper.manifestPermissions(permission).any { activity.shouldShowRequestPermissionRationale(it) }
 }
