@@ -35,7 +35,7 @@ jobs:
         run: >
           ./gradlew
           :kmppermission-core:testAndroidHostTest
-          :kmppermission-compose:compileAndroidMain
+          :kmppermission-compose:testAndroidHostTest
           :sample-android:assembleDebug
           :sample-android:lintDebug
 
@@ -73,6 +73,7 @@ jobs:
         run: >
           ./gradlew
           :kmppermission-core:iosSimulatorArm64Test
+          :kmppermission-compose:iosSimulatorArm64Test
           :kmppermission-core:checkKotlinAbi
           :kmppermission-compose:checkKotlinAbi
           :kmppermission-compose:compileKotlinIosArm64

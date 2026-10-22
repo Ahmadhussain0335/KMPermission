@@ -7,6 +7,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import io.github.ahmadhussain0335.kmppermission.Permission
+import io.github.ahmadhussain0335.kmppermission.PermissionException
+import io.github.ahmadhussain0335.kmppermission.PermissionManager
 import io.github.ahmadhussain0335.kmppermission.PermissionResult
 import kotlinx.coroutines.launch
 
@@ -20,16 +22,39 @@ public fun interface PermissionLauncher {
     public fun launch(vararg permissions: Permission)
 }
 
+/**
+ * Remembers a [PermissionLauncher] that reports each request's results to [onResult].
+ *
+ * @param onError receives configuration errors (a missing manifest or Info.plist entry, or a
+ *   permission unsupported on this platform) instead of [onResult]. The default rethrows them,
+ *   which fails fast; pass a handler to show or log them without crashing.
+ */
 @Composable
 public fun rememberPermissionLauncher(
+    onError: (PermissionException) -> Unit = { throw it },
+    onResult: (Map<Permission, PermissionResult>) -> Unit,
+): PermissionLauncher = rememberPermissionLauncher(rememberPermissionManager(), onError, onResult)
+
+@Composable
+internal fun rememberPermissionLauncher(
+    manager: PermissionManager,
+    onError: (PermissionException) -> Unit,
     onResult: (Map<Permission, PermissionResult>) -> Unit,
 ): PermissionLauncher {
-    val manager = rememberPermissionManager()
     val scope = rememberCoroutineScope()
+    val currentOnError by rememberUpdatedState(onError)
     val currentOnResult by rememberUpdatedState(onResult)
     return remember(manager) {
         PermissionLauncher { permissions ->
-            scope.launch { currentOnResult(manager.request(*permissions)) }
+            scope.launch {
+                val results = try {
+                    manager.request(*permissions)
+                } catch (e: PermissionException) {
+                    currentOnError(e)
+                    return@launch
+                }
+                currentOnResult(results)
+            }
         }
     }
 }

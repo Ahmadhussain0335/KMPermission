@@ -9,6 +9,12 @@ All notable changes to KMPermission. The Maven coordinates (`io.github.ahmadhuss
 - **The Kotlin package is now `io.github.ahmadhussain0335.kmppermission`.** It used to be `com.kmp.permission`, a namespace this project doesn't own; the new one matches the Maven group. The Compose layer moved from `com.kmp.permission.compose` to `io.github.ahmadhussain0335.kmppermission.compose`. Class and function names are unchanged. See [Migrating from 0.2.x](#migrating-from-02x).
 - The Android namespaces of the library modules changed to match: `io.github.ahmadhussain0335.kmppermission` and `io.github.ahmadhussain0335.kmppermission.compose`.
 
+### Compose layer
+
+- **Configuration errors no longer crash the composition.** `PermissionState` and `MultiplePermissionsState` have a new `error: PermissionException?` property, set when a check, request or observation fails because of a missing manifest or Info.plist entry or an unsupported permission. In 0.2.x these exceptions were thrown during composition or from the request coroutine and crashed the app.
+- `rememberPermissionLauncher` has a new `onError` parameter. Its default rethrows, so launchers that don't pass it fail fast as before.
+- The Compose module now has unit tests for `rememberPermissionState`, `rememberMultiplePermissions` and `rememberPermissionLauncher`, run on the Android host and the iOS simulator.
+
 ### Unchanged on purpose
 
 - **The SharedPreferences file is still named `com.kmp.permission.requested_permissions`.** It holds the request history that tells `Denied` apart from `PermanentlyDenied` on Android. Renaming it would drop that history for existing users, so permissions they had denied would read as never requested. Backup exclusion rules that name this file keep working without changes.
@@ -16,7 +22,7 @@ All notable changes to KMPermission. The Maven coordinates (`io.github.ahmadhuss
 
 ### Migrating from 0.2.x
 
-Replace the package in your imports; nothing else changes:
+Replace the package in your imports. Other code compiles unchanged; the one behaviour change is in the [Compose layer](#compose-layer).
 
 ```diff
 -import com.kmp.permission.Permission

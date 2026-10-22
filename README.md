@@ -160,6 +160,8 @@ fun CameraScreen() {
 }
 ```
 
+Configuration errors, such as a missing manifest or Info.plist entry, don't crash the composition: they are reported through `camera.error` (and `MultiplePermissionsState.error`). `rememberPermissionLauncher` takes an `onError` callback; without one it rethrows.
+
 ## Platform notes
 
 ### Android
