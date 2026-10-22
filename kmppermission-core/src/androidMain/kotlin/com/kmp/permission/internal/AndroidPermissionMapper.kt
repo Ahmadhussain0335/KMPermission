@@ -33,15 +33,24 @@ internal object AndroidPermissionMapper {
 
             // From API 31 the legacy BLUETOOTH/BLUETOOTH_ADMIN permissions are ignored and usually
             // declared with maxSdkVersion="30"; general Bluetooth use needs Scan and Connect instead.
+            // Below that, the legacy pair is install-time and scanning also needs location.
             Permission.Bluetooth ->
                 if (sdkInt >= Build.VERSION_CODES.S) {
                     PermissionMapper.androidManifestPermissions(Permission.BluetoothScan) +
                         PermissionMapper.androidManifestPermissions(Permission.BluetoothConnect)
                 } else {
-                    PermissionMapper.androidManifestPermissions(permission)
+                    PermissionMapper.androidManifestPermissions(permission) + bleScanLocationPermission(sdkInt)
                 }
 
-            Permission.BluetoothScan, Permission.BluetoothConnect ->
+            // Below API 31 BLE scans return no results without location permission.
+            Permission.BluetoothScan ->
+                if (sdkInt >= Build.VERSION_CODES.S) {
+                    PermissionMapper.androidManifestPermissions(permission)
+                } else {
+                    listOf(bleScanLocationPermission(sdkInt))
+                }
+
+            Permission.BluetoothConnect ->
                 if (sdkInt >= Build.VERSION_CODES.S) PermissionMapper.androidManifestPermissions(permission) else emptyList()
 
             // Below API 33 notifications have no runtime permission; see PermissionStatusResolver.
@@ -94,7 +103,7 @@ internal object AndroidPermissionMapper {
      */
     fun isAutoGranted(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): Boolean =
         when (permission) {
-            Permission.Bluetooth, Permission.BluetoothScan, Permission.BluetoothConnect -> sdkInt < Build.VERSION_CODES.S
+            Permission.BluetoothConnect -> sdkInt < Build.VERSION_CODES.S
             Permission.Storage -> sdkInt >= Build.VERSION_CODES.TIRAMISU
             else -> false
         }
@@ -106,6 +115,10 @@ internal object AndroidPermissionMapper {
      */
     fun requiresSeparateRequest(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): Boolean =
         permission == Permission.LocationBackground && sdkInt >= Build.VERSION_CODES.Q
+
+    /** The location permission BLE scanning needs below API 31: fine from API 29, coarse before. */
+    private fun bleScanLocationPermission(sdkInt: Int): String =
+        if (sdkInt >= Build.VERSION_CODES.Q) ACCESS_FINE_LOCATION else ACCESS_COARSE_LOCATION
 
     /** Foreground location permissions, one of which must be granted before background location. */
     val foregroundLocationPermissions: List<String> = listOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)

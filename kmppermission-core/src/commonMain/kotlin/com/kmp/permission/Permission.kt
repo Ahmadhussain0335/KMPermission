@@ -24,15 +24,19 @@ sealed class Permission(val group: PermissionGroup) {
 
     /**
      * General Bluetooth access. Android API 31+: `BLUETOOTH_SCAN` and `BLUETOOTH_CONNECT`; API 30 and
-     * below: the install-time `BLUETOOTH`/`BLUETOOTH_ADMIN`, always granted. iOS:
-     * `NSBluetoothAlwaysUsageDescription` (Core Bluetooth).
+     * below: the install-time `BLUETOOTH`/`BLUETOOTH_ADMIN` plus the location permission scanning
+     * needs there (see [BluetoothScan]). iOS: `NSBluetoothAlwaysUsageDescription` (Core Bluetooth).
      */
     data object Bluetooth : Permission(PermissionGroup.Bluetooth)
 
-    /** Scanning for nearby Bluetooth devices. Android 12+ (API 31+) only: `BLUETOOTH_SCAN`. */
+    /**
+     * Scanning for nearby Bluetooth devices. Android API 31+: `BLUETOOTH_SCAN`. Below that, BLE scans
+     * return no results without location permission, so this maps to `ACCESS_FINE_LOCATION` on API
+     * 29–30 and `ACCESS_COARSE_LOCATION` on API 26–28.
+     */
     data object BluetoothScan : Permission(PermissionGroup.Bluetooth)
 
-    /** Connecting to already-paired Bluetooth devices. Android 12+ (API 31+) only: `BLUETOOTH_CONNECT`. */
+    /** Connecting to already-paired Bluetooth devices. Android API 31+: `BLUETOOTH_CONNECT`; always granted below that. */
     data object BluetoothConnect : Permission(PermissionGroup.Bluetooth)
 
     /**

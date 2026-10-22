@@ -27,9 +27,22 @@ class AndroidPermissionMapperTest {
     }
 
     @Test
-    fun bluetoothScanAndConnect_requireNoManifestEntry_belowApi31() {
-        assertTrue(AndroidPermissionMapper.manifestPermissions(Permission.BluetoothScan, sdkInt = 30).isEmpty())
+    fun bluetoothConnect_isAutoGranted_withNoManifestEntry_belowApi31() {
+        assertTrue(AndroidPermissionMapper.isAutoGranted(Permission.BluetoothConnect, sdkInt = 30))
         assertTrue(AndroidPermissionMapper.manifestPermissions(Permission.BluetoothConnect, sdkInt = 30).isEmpty())
+    }
+
+    @Test
+    fun bluetoothScan_requiresFineLocation_onApi29And30() {
+        assertFalse(AndroidPermissionMapper.isAutoGranted(Permission.BluetoothScan, sdkInt = 30))
+        assertEquals(listOf("android.permission.ACCESS_FINE_LOCATION"), AndroidPermissionMapper.manifestPermissions(Permission.BluetoothScan, sdkInt = 30))
+        assertEquals(listOf("android.permission.ACCESS_FINE_LOCATION"), AndroidPermissionMapper.manifestPermissions(Permission.BluetoothScan, sdkInt = Build.VERSION_CODES.Q))
+    }
+
+    @Test
+    fun bluetoothScan_requiresCoarseLocation_belowApi29() {
+        assertEquals(listOf("android.permission.ACCESS_COARSE_LOCATION"), AndroidPermissionMapper.manifestPermissions(Permission.BluetoothScan, sdkInt = 28))
+        assertEquals(listOf("android.permission.ACCESS_COARSE_LOCATION"), AndroidPermissionMapper.manifestPermissions(Permission.BluetoothScan, sdkInt = 26))
     }
 
     @Test
@@ -53,8 +66,9 @@ class AndroidPermissionMapperTest {
     }
 
     @Test
-    fun bluetooth_isAutoGranted_onlyBelowApi31() {
-        assertTrue(AndroidPermissionMapper.isAutoGranted(Permission.Bluetooth, sdkInt = 30))
+    fun bluetooth_isNeverAutoGranted() {
+        assertFalse(AndroidPermissionMapper.isAutoGranted(Permission.Bluetooth, sdkInt = 28))
+        assertFalse(AndroidPermissionMapper.isAutoGranted(Permission.Bluetooth, sdkInt = 30))
         assertFalse(AndroidPermissionMapper.isAutoGranted(Permission.Bluetooth, sdkInt = Build.VERSION_CODES.S))
     }
 
@@ -67,10 +81,14 @@ class AndroidPermissionMapperTest {
     }
 
     @Test
-    fun bluetooth_requiresLegacyPermissions_belowApi31() {
+    fun bluetooth_requiresLegacyPermissionsAndScanLocation_belowApi31() {
         assertEquals(
-            listOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
+            listOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN", "android.permission.ACCESS_FINE_LOCATION"),
             AndroidPermissionMapper.manifestPermissions(Permission.Bluetooth, sdkInt = 30),
+        )
+        assertEquals(
+            listOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN", "android.permission.ACCESS_COARSE_LOCATION"),
+            AndroidPermissionMapper.manifestPermissions(Permission.Bluetooth, sdkInt = 28),
         )
     }
 
