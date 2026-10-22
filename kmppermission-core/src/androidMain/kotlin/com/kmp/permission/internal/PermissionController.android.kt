@@ -12,9 +12,11 @@ import com.kmp.permission.Permission
 import com.kmp.permission.PermissionException
 import com.kmp.permission.PermissionStatus
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
 
@@ -27,7 +29,6 @@ import kotlin.coroutines.resume
 internal actual class PermissionController actual constructor() : PermissionEngine {
 
     private var host: Host? = null
-    private val requestMutex = Mutex()
 
     private class Host(val activity: ComponentActivity, val launcher: ActivityResultLauncher<Array<String>>) {
         var pendingContinuation: CancellableContinuation<Unit>? = null
@@ -60,13 +61,25 @@ internal actual class PermissionController actual constructor() : PermissionEngi
 
         activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onDestroy(owner: LifecycleOwner) {
-                host = null
+                // The result of an in-flight prompt is delivered to the recreated Activity's
+                // registry, never back here, so the waiting caller is cancelled instead of left
+                // suspended forever (e.g. a ViewModel scope that survives a configuration change).
+                boundHost.pendingContinuation?.cancel()
+                boundHost.pendingContinuation = null
+                boundHost.launcher.unregister()
+                if (host === boundHost) host = null
             }
         })
     }
 
     private companion object {
         val launcherKeySequence = AtomicInteger(0)
+
+        /**
+         * Process-wide: Android shows one permission dialog at a time, and separate managers bound
+         * to the same Activity would otherwise launch over each other.
+         */
+        val requestMutex = Mutex()
     }
 
     actual override fun status(permission: Permission): PermissionStatus {
@@ -75,7 +88,11 @@ internal actual class PermissionController actual constructor() : PermissionEngi
         return activeHost.resolver.resolve(permission, activeHost.activity)
     }
 
-    actual override suspend fun request(permissions: Set<Permission>): Map<Permission, PermissionStatus> {
+    actual override suspend fun request(permissions: Set<Permission>): Map<Permission, PermissionStatus> =
+        // ActivityResultLauncher.launch must be called on the main thread.
+        withContext(Dispatchers.Main.immediate) { requestOnMain(permissions) }
+
+    private suspend fun requestOnMain(permissions: Set<Permission>): Map<Permission, PermissionStatus> {
         val activeHost = host ?: throw PermissionException.ManagerNotAttached()
         permissions.forEach { ManifestPermissionChecker.requireDeclared(activeHost.activity, it) }
 
