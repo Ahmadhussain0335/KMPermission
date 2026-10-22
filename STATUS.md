@@ -1,6 +1,6 @@
 # KMPermission: Project Status
 
-Last updated: 2026-10-22. Branch `fix/stability-pass` (16 commits on top of the `main` baseline). Not pushed; there is no remote yet.
+Last updated: 2026-10-22. Branch `fix/stability-pass` (19 commits on top of the `main` baseline). Not pushed; there is no remote yet.
 
 ## 1. Where things stand
 
@@ -11,7 +11,7 @@ Last updated: 2026-10-22. Branch `fix/stability-pass` (16 commits on top of the 
 | iOS engine | Done. Minimum iOS 15. |
 | Compose layer | Done. Android verified by the sample; iOS compiles but has never been run. |
 | Samples | Android (Compose) and iOS (SwiftUI); both build. |
-| Tests | 53 host tests: 13 manager, 7 mapper, 18 Android mapper, 9 Android status rules, 3 registry, 3 validator. All passing. |
+| Tests | 55 host tests: 13 manager, 7 mapper, 20 Android mapper, 9 Android status rules, 3 registry, 3 validator. All passing. |
 | Docs | README rewritten: setup table, usage, platform notes. |
 | Publishing / CI | Not started (deferred by decision). |
 
@@ -76,22 +76,23 @@ Last updated: 2026-10-22. Branch `fix/stability-pass` (16 commits on top of the 
 
 An independent review of the branch found the issues fixed in `c5cbaa6` and `199e725`.
 
+Decided afterwards: BLE scanning below API 31 now requires location permission. `BluetoothScan` maps to `ACCESS_FINE_LOCATION` on API 29–30 and `ACCESS_COARSE_LOCATION` on 26–28, and `Bluetooth` includes it there.
+
 ## 3. Left to do
 
 ### Needs your decision first
 1. **IoT permissions** (deferred): BLUETOOTH_ADVERTISE, NEARBY_WIFI_DEVICES, local network access (iOS `NSLocalNetworkUsageDescription`, and Android 17, which needs checking against the current docs).
-2. **BLE scanning on API 30 and below**: `BluetoothScan`/`Bluetooth` report Granted, but scans return nothing without location permission. For now this is only documented. The fix is to map BluetoothScan to FINE (API 29–30) or COARSE (26–28); it changes behaviour, so decide alongside your BLE stack.
-3. **Publishing** (deferred):
+2. **Publishing** (deferred):
    - Choose Maven Central, an internal repository, or source-only.
    - Then add `maven-publish` and signing, `explicitApi()`, the binary-compatibility validator, and an XCFramework/SPM if needed.
    - Move off the alpha/beta dependencies: material3 `1.11.0-alpha07` and lifecycle `2.11.0-beta01`.
-4. **CI**: GitHub Actions or GitLab CI depends on where the repo will live. Plan: host tests and assemble on every MR, plus an iOS job on an arm64 runner or Xcode Cloud.
-5. **SDK**: compileSdk 37 still depends on `android.suppressUnsupportedCompileSdk`. targetSdk stays at 36 until you approve 37.
+3. **CI**: GitHub Actions or GitLab CI depends on where the repo will live. Plan: host tests and assemble on every MR, plus an iOS job on an arm64 runner or Xcode Cloud.
+4. **SDK**: compileSdk 37 still depends on `android.suppressUnsupportedCompileSdk`. targetSdk stays at 36 until you approve 37.
 
 ### Work that can proceed
 - **Manual device test pass** on real devices:
   - iOS: the location When In Use → Always sequence, including "Allow Once", "Keep While Using" and Location Services off; Bluetooth; Notifications.
-  - Android: a dismissed dialog, "Don't allow" twice, background location on API 30+, selected photos on API 34+, rotation during a dialog.
+  - Android: a dismissed dialog, "Don't allow" twice, background location on API 30+, selected photos on API 34+, rotation during a dialog, Bluetooth on an API 30 or older device (location prompt).
 - **iOS tests**: `iosTest` is empty, and they need an Apple-silicon Mac.
 - **Android engine tests** with Robolectric: the controller and the store. The decision logic is already covered by `AndroidStatusRulesTest`.
 - **Compose tests**: none yet; they need the compose ui-test dependency.

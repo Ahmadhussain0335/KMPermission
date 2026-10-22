@@ -40,8 +40,8 @@ Declare what you use; the library checks and fails with a message naming the mis
 |---|---|---|
 | `Camera` | `CAMERA` | `NSCameraUsageDescription` |
 | `Microphone` | `RECORD_AUDIO` | `NSMicrophoneUsageDescription` |
-| `Bluetooth` | API 31+: `BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`. API 30 and below: `BLUETOOTH`, `BLUETOOTH_ADMIN` (declare with `maxSdkVersion="30"`) | `NSBluetoothAlwaysUsageDescription` |
-| `BluetoothScan` | `BLUETOOTH_SCAN` (API 31+) | `NSBluetoothAlwaysUsageDescription` |
+| `Bluetooth` | API 31+: `BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`. API 30 and below: `BLUETOOTH`, `BLUETOOTH_ADMIN` (declare with `maxSdkVersion="30"`) plus the scan location permission below | `NSBluetoothAlwaysUsageDescription` |
+| `BluetoothScan` | API 31+: `BLUETOOTH_SCAN`. API 29-30: `ACCESS_FINE_LOCATION`. API 26-28: `ACCESS_COARSE_LOCATION` | `NSBluetoothAlwaysUsageDescription` |
 | `BluetoothConnect` | `BLUETOOTH_CONNECT` (API 31+) | `NSBluetoothAlwaysUsageDescription` |
 | `LocationFine` | `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` | `NSLocationWhenInUseUsageDescription` |
 | `LocationCoarse` | `ACCESS_COARSE_LOCATION` | `NSLocationWhenInUseUsageDescription` |
@@ -57,7 +57,7 @@ Declare what you use; the library checks and fails with a message naming the mis
 
 Usage strings must describe the real feature. App Review rejects generic text.
 
-Android API 30 and below: BLE scan results also require location permission (`ACCESS_FINE_LOCATION` on API 29-30, `ACCESS_COARSE_LOCATION` on API 26-28). `BluetoothScan` and `Bluetooth` report `Granted` there without checking it, so request `LocationFine` as well.
+Below API 31, BLE scans return no results without location permission, so `BluetoothScan` and `Bluetooth` request it there. Declare `BLUETOOTH_SCAN` with `android:usesPermissionFlags="neverForLocation"` only if you never derive location from scan results.
 
 ## Usage
 
