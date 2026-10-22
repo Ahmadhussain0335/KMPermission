@@ -57,6 +57,8 @@ Declare what you use; the library checks and fails with a message naming the mis
 
 Usage strings must describe the real feature. App Review rejects generic text.
 
+Android API 30 and below: BLE scan results also require location permission (`ACCESS_FINE_LOCATION` on API 29-30, `ACCESS_COARSE_LOCATION` on API 26-28). `BluetoothScan` and `Bluetooth` report `Granted` there without checking it, so request `LocationFine` as well.
+
 ## Usage
 
 ### Android
@@ -107,12 +109,13 @@ fun CameraScreen() {
 - `LocationBackground` is requested on its own after foreground location, and foreground location is asked for first if it isn't granted. On API 30+ the system shows a Settings page for it. Below API 29 foreground location covers it.
 - `Storage` reports `Granted` on API 33+, where no storage permission exists. Use `Photos` or the system pickers for media.
 - `Notifications` below API 33 reflects whether notifications are enabled in Settings.
-- BLE scanning on API 30 and below also needs location permission. Request `LocationFine` alongside `Bluetooth` there.
-- `Denied` versus `PermanentlyDenied` relies on a small history the library keeps in SharedPreferences (`com.kmp.permission.requested_permissions`). Exclude it from backup; see `sample-android/src/main/res/xml/`. Otherwise a restored install reports never-requested permissions as permanently denied. Two dismissed dialogs in a row are reported as `PermanentlyDenied`.
+- `Denied` versus `PermanentlyDenied` relies on a small history the library keeps in SharedPreferences (`com.kmp.permission.requested_permissions`). Exclude it from backup; see `sample-android/src/main/res/xml/`. Otherwise a restored install reports never-requested permissions as permanently denied.
+- A system auto-deny is recognised because the result arrives within 500 ms, faster than a person can answer a dialog. A dismissed dialog stays `Denied`.
 
 ### iOS
 
-- `LocationFine` reports `Limited` when Precise Location is off. The library does not request temporary full accuracy.
+- Requires iOS 15 or later (the Kotlin/Native framework's minimum).
+- `LocationFine` reports `Limited` when Precise Location is off. Requesting again does not change that; the user has to turn Precise Location on in Settings. The library does not request temporary full accuracy.
 - `Bluetooth`, `BluetoothScan` and `BluetoothConnect` share one Core Bluetooth authorization.
 
 ## Building and testing

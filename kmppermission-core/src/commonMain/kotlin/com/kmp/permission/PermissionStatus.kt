@@ -12,8 +12,8 @@ sealed interface PermissionStatus {
     data object Granted : PermissionStatus
 
     /**
-     * Partly granted: the feature works, but with reduced scope. Requesting again or opening
-     * settings can widen it. Reported for:
+     * Partly granted: the feature works, but with reduced scope. Opening settings can widen it, and
+     * on Android so can requesting again. Reported for:
      * - [Permission.Photos]: the user picked specific photos (iOS Limited, Android 14+ selected photos).
      * - [Permission.Contacts]: the user shared specific contacts (iOS 18+).
      * - [Permission.Calendar]: write-only access (iOS 17+).
