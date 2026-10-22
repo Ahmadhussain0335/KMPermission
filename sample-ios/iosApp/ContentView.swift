@@ -61,6 +61,8 @@ private func color(for status: PermissionStatus) -> Color {
 private final class PermissionDemoViewModel: ObservableObject {
     private let manager = PermissionManager_iosKt.PermissionManager()
     @Published private var statuses: [String: PermissionStatus] = [:]
+    /// Set only from a request's completion, so UI tests can tell that a request returned.
+    @Published private(set) var lastCompleted = ""
 
     func status(for item: PermissionDemoItem) -> PermissionStatus {
         let known = item.permissions.map { statuses[key(for: $0)] ?? PermissionStatusNotDetermined.shared }
@@ -84,6 +86,7 @@ private final class PermissionDemoViewModel: ObservableObject {
                 for (permission, status) in results {
                     self.statuses[self.key(for: permission)] = status
                 }
+                self.lastCompleted = "\(item.title): \(label(for: self.status(for: item)))"
             }
         }
     }
@@ -103,11 +106,18 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
+                Section {
+                    Text(viewModel.lastCompleted.isEmpty ? "No request completed yet" : "Last completed: \(viewModel.lastCompleted)")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .accessibilityIdentifier("last-completed")
+                }
                 ForEach(demoItems) { item in
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(item.title).font(.headline)
                             Text(label(for: viewModel.status(for: item)))
+                                .accessibilityIdentifier("status-\(item.title)")
                                 .font(.caption)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 3)
@@ -119,6 +129,7 @@ struct ContentView: View {
                         Button("Request") {
                             viewModel.request(item)
                         }
+                        .accessibilityIdentifier("request-\(item.title)")
                         .buttonStyle(.borderedProminent)
                     }
                     .padding(.vertical, 4)
@@ -127,10 +138,15 @@ struct ContentView: View {
                     Button("Open App Settings") {
                         viewModel.openSettings()
                     }
+                    .accessibilityIdentifier("open-settings")
                 }
             }
             .navigationTitle("KMPermission Sample")
             .onAppear { viewModel.refreshInitialStatuses() }
+            // Picks up changes the user made in Settings while the app was in the background.
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                viewModel.refreshInitialStatuses()
+            }
         }
     }
 }

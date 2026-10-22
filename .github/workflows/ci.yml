@@ -77,16 +77,18 @@ jobs:
           :kmppermission-compose:compileKotlinIosSimulatorArm64
           :kmppermission-core:linkDebugFrameworkIosArm64
 
-      - name: Build iOS sample (unsigned)
+      # Builds the sample and its device UI tests. The tests themselves need a physical device and
+      # answer real permission prompts, so they are run locally (see README).
+      - name: Build iOS sample and UI tests (unsigned)
         working-directory: sample-ios
         run: >
           xcodebuild
           -project iosApp.xcodeproj
-          -scheme iosApp
+          -scheme iosAppUITests
           -configuration Debug
           -destination 'generic/platform=iOS'
           CODE_SIGNING_ALLOWED=NO
-          build
+          build-for-testing
 
       - name: Upload test reports
         if: failure()

@@ -131,4 +131,17 @@ fun CameraScreen() {
 ./gradlew :kmppermission-core:compileKotlinIosSimulatorArm64      # iOS compile check
 ```
 
-iOS tests (`iosSimulatorArm64Test`) need an Apple-silicon Mac. To build the iOS sample, open `sample-ios/iosApp.xcodeproj` and set your team in `sample-ios/Configuration/Config.xcconfig`.
+iOS tests (`iosSimulatorArm64Test`) need an Apple-silicon Mac. To build the iOS sample, open `sample-ios/iosApp.xcodeproj` and set your team in `sample-ios/Configuration/Config.xcconfig`, or pass `TEAM_ID=<team>` to `xcodebuild`.
+
+CI (`.github/workflows/ci.yml`) runs the host tests, lint, the shared tests on the iOS simulator, and builds both samples and the iOS UI tests on every push to `main` and every pull request.
+
+### Device tests
+
+`sample-ios/iosAppUITests` drives the iOS sample through real system permission alerts: denial, approximate location, declining and accepting the Always upgrade, Bluetooth, Contacts (including the iOS 18+ sharing sheet), Calendar, Photos, Notifications, Motion, Speech, and a change made in Settings. It resets permissions itself where XCUITest allows it. Run it on an unlocked device:
+
+```sh
+xcodebuild test -project sample-ios/iosApp.xcodeproj -scheme iosAppUITests \
+  -destination 'platform=iOS,id=<device UDID>' TEAM_ID=<team> -allowProvisioningUpdates
+```
+
+With a free Personal Team, trust the developer certificate on the device first (Settings → General → VPN & Device Management).
