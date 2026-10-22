@@ -40,6 +40,16 @@ private class BluetoothCoreImpl : NSObject(), CBCentralManagerDelegateProtocol {
      */
     suspend fun request() {
         if (authorization() != CBManagerAuthorizationNotDetermined) return
+        // Backstop in case no further state update arrives once the user has answered.
+        val removeObservers = observeAppActivity { if (it == AppActivityEvent.DidBecomeActive) resumeIfDecided() }
+        try {
+            awaitDecision()
+        } finally {
+            removeObservers()
+        }
+    }
+
+    private suspend fun awaitDecision() {
         suspendCancellableCoroutine { continuation ->
             pendingContinuation = continuation
             continuation.invokeOnCancellation { pendingContinuation = null }
@@ -52,7 +62,9 @@ private class BluetoothCoreImpl : NSObject(), CBCentralManagerDelegateProtocol {
         }
     }
 
-    override fun centralManagerDidUpdateState(central: CBCentralManager) {
+    override fun centralManagerDidUpdateState(central: CBCentralManager) = resumeIfDecided()
+
+    private fun resumeIfDecided() {
         // State updates can arrive before the user has answered the prompt.
         if (authorization() == CBManagerAuthorizationNotDetermined) return
         val continuation = pendingContinuation ?: return

@@ -20,6 +20,7 @@ private enum class LocationSignal { AuthorizationChanged, PromptShown, PromptDis
 
 private val PROMPT_APPEAR_TIMEOUT = 1.seconds
 private val AUTHORIZATION_SETTLE_TIMEOUT = 500.milliseconds
+private val APP_ACTIVE_TIMEOUT = 2.seconds
 
 private suspend fun Channel<LocationSignal>.awaitSignal(signal: LocationSignal) {
     while (receive() != signal) continue
@@ -58,21 +59,25 @@ private class LocationCoreImpl : NSObject(), CLLocationManagerDelegateProtocol {
 
     suspend fun requestWhenInUse() {
         if (authorizationStatus() != kCLAuthorizationStatusNotDetermined) return
-        // From NotDetermined the prompt always appears and any answer changes the status.
-        withSignals { channel ->
-            delegateManager().requestWhenInUseAuthorization()
-            channel.awaitSignal(LocationSignal.AuthorizationChanged)
-        }
+        awaitPromptOutcome { delegateManager().requestWhenInUseAuthorization() }
     }
 
     suspend fun requestAlways() {
         // "Always" can only be requested as an upgrade from "When In Use"; from any other state iOS
         // shows nothing and never calls the delegate.
         if (authorizationStatus() != kCLAuthorizationStatusAuthorizedWhenInUse) return
+        awaitPromptOutcome { delegateManager().requestAlwaysAuthorization() }
+    }
 
-        // The upgrade prompt is shown at most once per install, and keeping "While Using" leaves the
-        // status unchanged, so the delegate may never fire. App activity changes tell us whether a
-        // prompt appeared and when it was dismissed.
+    /**
+     * Runs [trigger] and waits until its prompt has been answered or dismissed.
+     *
+     * The delegate alone is not enough: the "Always" upgrade prompt is shown at most once per
+     * install, keeping "While Using" leaves the status unchanged, and with Location Services off no
+     * prompt appears at all. App activity changes tell us whether a prompt appeared and when it closed.
+     */
+    private suspend fun awaitPromptOutcome(trigger: () -> Unit) {
+        awaitAppActive(APP_ACTIVE_TIMEOUT)
         withSignals { channel ->
             val removeObservers = observeAppActivity { event ->
                 channel.trySend(
@@ -83,9 +88,9 @@ private class LocationCoreImpl : NSObject(), CLLocationManagerDelegateProtocol {
                 )
             }
             try {
-                delegateManager().requestAlwaysAuthorization()
-                val first = withTimeoutOrNull(PROMPT_APPEAR_TIMEOUT) { channel.receive() } ?: return@withSignals
-                if (first == LocationSignal.AuthorizationChanged) return@withSignals
+                trigger()
+                val first = withTimeoutOrNull(PROMPT_APPEAR_TIMEOUT) { channel.receive() }
+                if (first != LocationSignal.PromptShown) return@withSignals
                 while (true) {
                     when (channel.receive()) {
                         LocationSignal.AuthorizationChanged -> return@withSignals
