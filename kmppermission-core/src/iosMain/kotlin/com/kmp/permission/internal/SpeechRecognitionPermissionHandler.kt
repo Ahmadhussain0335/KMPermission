@@ -14,10 +14,10 @@ internal class SpeechRecognitionPermissionHandler : IosPermissionHandler {
         if (SFSpeechRecognizer.authorizationStatus() != SFSpeechRecognizerAuthorizationStatus.SFSpeechRecognizerAuthorizationStatusNotDetermined) {
             return status()
         }
-        suspendCancellableCoroutine<Unit> { continuation ->
-            SFSpeechRecognizer.requestAuthorization { continuation.resume(Unit) }
+        val answered = suspendCancellableCoroutine { continuation ->
+            SFSpeechRecognizer.requestAuthorization { continuation.resume(it) }
         }
-        return status()
+        return status().orIfUndetermined(map(answered))
     }
 
     private fun map(status: SFSpeechRecognizerAuthorizationStatus): PermissionStatus = when (status) {

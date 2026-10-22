@@ -20,12 +20,12 @@ internal class ContactsPermissionHandler : IosPermissionHandler {
         if (CNContactStore.authorizationStatusForEntityType(CNEntityType.CNEntityTypeContacts) != CNAuthorizationStatusNotDetermined) {
             return status()
         }
-        suspendCancellableCoroutine<Unit> { continuation ->
-            CNContactStore().requestAccessForEntityType(CNEntityType.CNEntityTypeContacts) { _, _ ->
-                continuation.resume(Unit)
+        val granted = suspendCancellableCoroutine { continuation ->
+            CNContactStore().requestAccessForEntityType(CNEntityType.CNEntityTypeContacts) { granted, _ ->
+                continuation.resume(granted)
             }
         }
-        return status()
+        return status().orIfUndetermined(grantedToStatus(granted))
     }
 
     private fun map(status: CNAuthorizationStatus): PermissionStatus = when (status) {

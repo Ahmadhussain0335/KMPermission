@@ -21,12 +21,10 @@ internal class PhotosPermissionHandler : IosPermissionHandler {
         if (PHPhotoLibrary.authorizationStatusForAccessLevel(PHAccessLevelReadWrite) != PHAuthorizationStatusNotDetermined) {
             return status()
         }
-        suspendCancellableCoroutine<Unit> { continuation ->
-            PHPhotoLibrary.requestAuthorizationForAccessLevel(PHAccessLevelReadWrite) {
-                continuation.resume(Unit)
-            }
+        val answered = suspendCancellableCoroutine { continuation ->
+            PHPhotoLibrary.requestAuthorizationForAccessLevel(PHAccessLevelReadWrite) { continuation.resume(it) }
         }
-        return status()
+        return status().orIfUndetermined(map(answered))
     }
 
     private fun map(status: PHAuthorizationStatus): PermissionStatus = when (status) {

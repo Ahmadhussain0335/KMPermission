@@ -22,15 +22,15 @@ internal class CalendarPermissionHandler : IosPermissionHandler {
         if (EKEventStore.authorizationStatusForEntityType(EKEntityType.EKEntityTypeEvent) != EKAuthorizationStatusNotDetermined) {
             return status()
         }
-        suspendCancellableCoroutine<Unit> { continuation ->
+        val granted = suspendCancellableCoroutine { continuation ->
             if (iosMajorVersion >= 17) {
-                store.requestFullAccessToEventsWithCompletion { _, _ -> continuation.resume(Unit) }
+                store.requestFullAccessToEventsWithCompletion { granted, _ -> continuation.resume(granted) }
             } else {
                 @Suppress("DEPRECATION")
-                store.requestAccessToEntityType(EKEntityType.EKEntityTypeEvent) { _, _ -> continuation.resume(Unit) }
+                store.requestAccessToEntityType(EKEntityType.EKEntityTypeEvent) { granted, _ -> continuation.resume(granted) }
             }
         }
-        return status()
+        return status().orIfUndetermined(grantedToStatus(granted))
     }
 
     private fun map(status: EKAuthorizationStatus): PermissionStatus = when (status) {

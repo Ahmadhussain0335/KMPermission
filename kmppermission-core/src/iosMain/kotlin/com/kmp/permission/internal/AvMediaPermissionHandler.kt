@@ -22,10 +22,10 @@ internal class AvMediaPermissionHandler(private val mediaType: AVMediaType) : Io
         if (AVCaptureDevice.authorizationStatusForMediaType(mediaType) != AVAuthorizationStatusNotDetermined) {
             return status()
         }
-        suspendCancellableCoroutine<Unit> { continuation ->
-            AVCaptureDevice.requestAccessForMediaType(mediaType) { continuation.resume(Unit) }
+        val granted = suspendCancellableCoroutine { continuation ->
+            AVCaptureDevice.requestAccessForMediaType(mediaType) { continuation.resume(it) }
         }
-        return status()
+        return status().orIfUndetermined(grantedToStatus(granted))
     }
 
     private fun map(status: AVAuthorizationStatus): PermissionStatus = when (status) {

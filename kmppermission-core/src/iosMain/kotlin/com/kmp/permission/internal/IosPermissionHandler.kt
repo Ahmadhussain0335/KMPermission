@@ -17,3 +17,14 @@ internal interface IosPermissionHandler {
 
     suspend fun request(): PermissionStatus
 }
+
+/**
+ * The authorization status read straight after a prompt's completion handler can still be
+ * NotDetermined (seen with EventKit on iOS 26), so fall back to what the completion reported.
+ */
+internal fun PermissionStatus.orIfUndetermined(fromCompletion: PermissionStatus): PermissionStatus =
+    if (this == PermissionStatus.NotDetermined) fromCompletion else this
+
+/** A yes/no prompt answer. A "no" on iOS is final; see [IosPermissionHandler]. */
+internal fun grantedToStatus(granted: Boolean): PermissionStatus =
+    if (granted) PermissionStatus.Granted else PermissionStatus.PermanentlyDenied
