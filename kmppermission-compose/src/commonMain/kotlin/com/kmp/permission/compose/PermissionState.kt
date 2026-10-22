@@ -45,6 +45,13 @@ private class MutablePermissionState(
     }
 }
 
+/**
+ * Remembers a [PermissionState] for [permission], kept up to date while in composition.
+ *
+ * @throws com.kmp.permission.PermissionException if [permission] is unsupported on this platform or
+ *   missing its manifest/Info.plist entry. These are configuration errors and fail fast, as they do
+ *   in the core API.
+ */
 @Composable
 fun rememberPermissionState(permission: Permission): PermissionState {
     val manager = rememberPermissionManager()

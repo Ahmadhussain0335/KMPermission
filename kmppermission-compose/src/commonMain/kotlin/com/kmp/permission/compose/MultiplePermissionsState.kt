@@ -2,6 +2,7 @@ package com.kmp.permission.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.kmp.permission.Permission
@@ -40,10 +41,18 @@ private class MutableMultiplePermissionsState(
     }
 }
 
+/**
+ * Remembers a [MultiplePermissionsState] for [permissions].
+ *
+ * @throws com.kmp.permission.PermissionException if a permission is unsupported on this platform or
+ *   missing its manifest/Info.plist entry. These are configuration errors and fail fast, as they do
+ *   in the core API.
+ */
 @Composable
 fun rememberMultiplePermissions(vararg permissions: Permission): MultiplePermissionsState {
     val manager = rememberPermissionManager()
     val scope = rememberCoroutineScope()
-    val permissionStates = permissions.map { rememberPermissionState(it) }
+    // Keyed so each permission keeps its own state if the set changes between compositions.
+    val permissionStates = permissions.map { key(it) { rememberPermissionState(it) } }
     return remember(permissionStates, manager) { MutableMultiplePermissionsState(permissionStates, manager, scope) }
 }
