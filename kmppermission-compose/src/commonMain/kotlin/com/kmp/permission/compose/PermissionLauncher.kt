@@ -16,12 +16,12 @@ import kotlinx.coroutines.launch
  * `Button`'s `onClick`) that need to fire a request without a full [PermissionState].
  */
 @Stable
-fun interface PermissionLauncher {
-    fun launch(vararg permissions: Permission)
+public fun interface PermissionLauncher {
+    public fun launch(vararg permissions: Permission)
 }
 
 @Composable
-fun rememberPermissionLauncher(
+public fun rememberPermissionLauncher(
     onResult: (Map<Permission, PermissionResult>) -> Unit,
 ): PermissionLauncher {
     val manager = rememberPermissionManager()

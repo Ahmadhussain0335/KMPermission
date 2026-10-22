@@ -13,7 +13,7 @@ import com.kmp.permission.PermissionResult
  * permission requests, for screens that need a permission immediately rather than behind a button.
  */
 @Composable
-fun PermissionEffect(
+public fun PermissionEffect(
     vararg permissions: Permission,
     onResult: (Map<Permission, PermissionResult>) -> Unit,
 ) {

@@ -14,44 +14,44 @@ package com.kmp.permission
  *
  * @property group the category this permission belongs to.
  */
-sealed class Permission(val group: PermissionGroup) {
+public sealed class Permission(public val group: PermissionGroup) {
 
     /** The device camera(s). Android: `CAMERA`. iOS: `NSCameraUsageDescription`. */
-    data object Camera : Permission(PermissionGroup.Camera)
+    public data object Camera : Permission(PermissionGroup.Camera)
 
     /** The microphone. Android: `RECORD_AUDIO`. iOS: `NSMicrophoneUsageDescription`. */
-    data object Microphone : Permission(PermissionGroup.Microphone)
+    public data object Microphone : Permission(PermissionGroup.Microphone)
 
     /**
      * General Bluetooth access. Android API 31+: `BLUETOOTH_SCAN` and `BLUETOOTH_CONNECT`; API 30 and
      * below: the install-time `BLUETOOTH`/`BLUETOOTH_ADMIN` plus the location permission scanning
      * needs there (see [BluetoothScan]). iOS: `NSBluetoothAlwaysUsageDescription` (Core Bluetooth).
      */
-    data object Bluetooth : Permission(PermissionGroup.Bluetooth)
+    public data object Bluetooth : Permission(PermissionGroup.Bluetooth)
 
     /**
      * Scanning for nearby Bluetooth devices. Android API 31+: `BLUETOOTH_SCAN`. Below that, BLE scans
      * return no results without location permission, so this maps to `ACCESS_FINE_LOCATION` on API
      * 29–30 and `ACCESS_COARSE_LOCATION` on API 26–28.
      */
-    data object BluetoothScan : Permission(PermissionGroup.Bluetooth)
+    public data object BluetoothScan : Permission(PermissionGroup.Bluetooth)
 
     /** Connecting to already-paired Bluetooth devices. Android API 31+: `BLUETOOTH_CONNECT`; always granted below that. */
-    data object BluetoothConnect : Permission(PermissionGroup.Bluetooth)
+    public data object BluetoothConnect : Permission(PermissionGroup.Bluetooth)
 
     /**
      * Making the device discoverable to other Bluetooth devices (BLE advertising). Android API 31+:
      * `BLUETOOTH_ADVERTISE`; below that the install-time `BLUETOOTH_ADMIN` covers it, so it is always
      * granted. iOS: `NSBluetoothAlwaysUsageDescription`, sharing [Bluetooth]'s authorization.
      */
-    data object BluetoothAdvertise : Permission(PermissionGroup.Bluetooth)
+    public data object BluetoothAdvertise : Permission(PermissionGroup.Bluetooth)
 
     /**
      * Discovering and connecting to nearby devices over Wi-Fi (Wi-Fi Direct, Wi-Fi Aware, scan
      * results, local-only hotspots). Android API 33+: `NEARBY_WIFI_DEVICES`; below that these APIs
      * need `ACCESS_FINE_LOCATION`, which this maps to. Unsupported on iOS.
      */
-    data object NearbyWifiDevices : Permission(PermissionGroup.Network)
+    public data object NearbyWifiDevices : Permission(PermissionGroup.Network)
 
     /**
      * Connecting to devices on the local network (TCP/UDP to local addresses, multicast, mDNS).
@@ -62,17 +62,17 @@ sealed class Permission(val group: PermissionGroup) {
      * Unsupported on iOS: there is no API to read local network authorization. iOS shows its prompt
      * (`NSLocalNetworkUsageDescription`) on the first local network connection; handle failures there.
      */
-    data object LocalNetwork : Permission(PermissionGroup.Network)
+    public data object LocalNetwork : Permission(PermissionGroup.Network)
 
     /**
      * Precise device location. Android: `ACCESS_FINE_LOCATION`, plus `ACCESS_COARSE_LOCATION` on API
      * 31+, which the system requires in the same request. iOS: `NSLocationWhenInUseUsageDescription`.
      * Reported as [PermissionStatus.Limited] when the user allowed only approximate location.
      */
-    data object LocationFine : Permission(PermissionGroup.Location)
+    public data object LocationFine : Permission(PermissionGroup.Location)
 
     /** Approximate device location. Android: `ACCESS_COARSE_LOCATION`. iOS shares [LocationFine]'s authorization. */
-    data object LocationCoarse : Permission(PermissionGroup.Location)
+    public data object LocationCoarse : Permission(PermissionGroup.Location)
 
     /**
      * Location access while backgrounded. Android API 29+: `ACCESS_BACKGROUND_LOCATION`, requested
@@ -80,30 +80,30 @@ sealed class Permission(val group: PermissionGroup) {
      * 30+ the system shows a Settings page for it); below API 29 foreground location covers it. iOS:
      * both `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription`.
      */
-    data object LocationBackground : Permission(PermissionGroup.Location)
+    public data object LocationBackground : Permission(PermissionGroup.Location)
 
     /**
      * Posting local/push notifications. Android 13+ (API 33+): `POST_NOTIFICATIONS`; below that,
      * reflects whether notifications are enabled in Settings. iOS: `UNUserNotificationCenter`
      * authorization.
      */
-    data object Notifications : Permission(PermissionGroup.Notifications)
+    public data object Notifications : Permission(PermissionGroup.Notifications)
 
     /** The user's contacts. Android: `READ_CONTACTS`. iOS: `NSContactsUsageDescription`. */
-    data object Contacts : Permission(PermissionGroup.Contacts)
+    public data object Contacts : Permission(PermissionGroup.Contacts)
 
     /**
      * The user's calendar. Android: `READ_CALENDAR`. iOS 17+: `NSCalendarsFullAccessUsageDescription`;
      * earlier iOS: `NSCalendarsUsageDescription`.
      */
-    data object Calendar : Permission(PermissionGroup.Calendar)
+    public data object Calendar : Permission(PermissionGroup.Calendar)
 
     /**
      * Reading shared storage. Android below API 33: `READ_EXTERNAL_STORAGE`. API 33+ has no storage
      * permission (apps use scoped storage and the system pickers; use [Photos] for media), so this
      * is always [PermissionStatus.Granted] there. Unsupported on iOS.
      */
-    data object Storage : Permission(PermissionGroup.Storage)
+    public data object Storage : Permission(PermissionGroup.Storage)
 
     /**
      * The photo/video library. Android 13+ (API 33+): `READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO`; below
@@ -111,14 +111,14 @@ sealed class Permission(val group: PermissionGroup) {
      * support selected-photos access, reported as [PermissionStatus.Limited]. iOS:
      * `NSPhotoLibraryUsageDescription`.
      */
-    data object Photos : Permission(PermissionGroup.Photos)
+    public data object Photos : Permission(PermissionGroup.Photos)
 
     /** Near-field communication. Android only: `NFC`. Unsupported on iOS. */
-    data object Nfc : Permission(PermissionGroup.Nfc)
+    public data object Nfc : Permission(PermissionGroup.Nfc)
 
     /** Motion and fitness data. iOS only: `NSMotionUsageDescription` (Core Motion). Unsupported on Android. */
-    data object Motion : Permission(PermissionGroup.Motion)
+    public data object Motion : Permission(PermissionGroup.Motion)
 
     /** Speech-to-text transcription authorization. iOS only: `NSSpeechRecognitionUsageDescription`. On Android this is covered by [Microphone]. */
-    data object SpeechRecognition : Permission(PermissionGroup.SpeechRecognition)
+    public data object SpeechRecognition : Permission(PermissionGroup.SpeechRecognition)
 }

@@ -13,17 +13,17 @@ import kotlinx.coroutines.launch
 
 /** Observable Compose state for a batch of [Permission]s, obtained via [rememberMultiplePermissions]. */
 @Stable
-interface MultiplePermissionsState {
-    val permissions: List<PermissionState>
+public interface MultiplePermissionsState {
+    public val permissions: List<PermissionState>
 
     /** True if every permission is [PermissionStatus.Granted]; [PermissionStatus.Limited] does not count. */
-    val allGranted: Boolean
+    public val allGranted: Boolean
 
     /** True if at least one permission is [PermissionStatus.Granted]; [PermissionStatus.Limited] does not count. */
-    val anyGranted: Boolean
+    public val anyGranted: Boolean
 
     /** Requests every permission in [permissions] in a single batched system prompt where supported. */
-    fun launchMultiplePermissionRequest()
+    public fun launchMultiplePermissionRequest()
 }
 
 private class MutableMultiplePermissionsState(
@@ -49,7 +49,7 @@ private class MutableMultiplePermissionsState(
  *   in the core API.
  */
 @Composable
-fun rememberMultiplePermissions(vararg permissions: Permission): MultiplePermissionsState {
+public fun rememberMultiplePermissions(vararg permissions: Permission): MultiplePermissionsState {
     val manager = rememberPermissionManager()
     val scope = rememberCoroutineScope()
     // Keyed so each permission keeps its own state if the set changes between compositions.

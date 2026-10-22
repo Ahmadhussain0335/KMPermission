@@ -8,4 +8,4 @@ package com.kmp.permission
  * for call-site clarity — a [PermissionResult] is something you just asked for, a [PermissionStatus]
  * is something you are inspecting at rest — without duplicating the state machine.
  */
-typealias PermissionResult = PermissionStatus
+public typealias PermissionResult = PermissionStatus

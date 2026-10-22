@@ -20,7 +20,7 @@ import kotlinx.coroutines.CoroutineScope
  *   scope; defaults to [activity]'s own `lifecycleScope` so in-flight requests are cancelled
  *   automatically when the Activity is destroyed.
  */
-fun PermissionManager(
+public fun PermissionManager(
     activity: ComponentActivity,
     scope: CoroutineScope = activity.lifecycleScope,
 ): PermissionManager {

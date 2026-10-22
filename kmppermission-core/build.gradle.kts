@@ -6,6 +6,9 @@ plugins {
 }
 
 kotlin {
+    // Every public declaration must state its visibility, so nothing becomes API by accident.
+    explicitApi()
+
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }

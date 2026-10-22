@@ -15,7 +15,7 @@ import kotlinx.coroutines.MainScope
  * @param scope requests launched via the callback [PermissionManager.request] overloads run on this
  *   scope; defaults to a fresh main-thread [MainScope].
  */
-fun PermissionManager(scope: CoroutineScope = MainScope()): PermissionManager =
+public fun PermissionManager(scope: CoroutineScope = MainScope()): PermissionManager =
     PermissionFactory.create(PermissionController(), scope)
 
 /**
@@ -24,4 +24,4 @@ fun PermissionManager(scope: CoroutineScope = MainScope()): PermissionManager =
  * reachable from Swift without supplying a [CoroutineScope] explicitly. This is the equivalent of
  * what `@JvmOverloads` generates automatically on the JVM, written by hand for Kotlin/Native.
  */
-fun PermissionManager(): PermissionManager = PermissionManager(MainScope())
+public fun PermissionManager(): PermissionManager = PermissionManager(MainScope())

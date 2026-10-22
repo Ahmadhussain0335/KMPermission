@@ -22,12 +22,12 @@ import kotlinx.coroutines.launch
  * Settings while this composable is still on screen.
  */
 @Stable
-interface PermissionState {
-    val permission: Permission
-    val status: PermissionStatus
+public interface PermissionState {
+    public val permission: Permission
+    public val status: PermissionStatus
 
     /** Requests [permission], suspending in the background; recompose happens via [status]. */
-    fun launchPermissionRequest()
+    public fun launchPermissionRequest()
 }
 
 private class MutablePermissionState(
@@ -53,7 +53,7 @@ private class MutablePermissionState(
  *   in the core API.
  */
 @Composable
-fun rememberPermissionState(permission: Permission): PermissionState {
+public fun rememberPermissionState(permission: Permission): PermissionState {
     val manager = rememberPermissionManager()
     val scope = rememberCoroutineScope()
     val state = remember(permission, manager) { MutablePermissionState(permission, manager, scope) }
