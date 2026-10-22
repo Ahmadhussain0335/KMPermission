@@ -1,0 +1,48 @@
+package com.kmp.permission.internal
+
+import com.kmp.permission.Permission
+import com.kmp.permission.PermissionException
+import com.kmp.permission.PermissionStatus
+import platform.AVFoundation.AVMediaTypeAudio
+import platform.AVFoundation.AVMediaTypeVideo
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
+import platform.UIKit.UIApplicationOpenSettingsURLString
+
+/**
+ * Real iOS runtime engine. Dispatches each [Permission] to the native Apple framework handler that
+ * owns it — see [IosPermissionHandler] for the shared status/request contract every handler follows.
+ */
+internal actual class PermissionController actual constructor() : PermissionEngine {
+
+    private fun handlerFor(permission: Permission): IosPermissionHandler = when (permission) {
+        Permission.Camera -> AvMediaPermissionHandler(AVMediaTypeVideo)
+        Permission.Microphone -> AvMediaPermissionHandler(AVMediaTypeAudio)
+        Permission.Photos -> PhotosPermissionHandler()
+        Permission.Bluetooth, Permission.BluetoothScan, Permission.BluetoothConnect -> BluetoothPermissionHandler
+        Permission.LocationFine -> LocationFineHandler()
+        Permission.LocationCoarse -> LocationCoarseHandler()
+        Permission.LocationBackground -> LocationBackgroundHandler()
+        Permission.Notifications -> NotificationsPermissionHandler()
+        Permission.Contacts -> ContactsPermissionHandler()
+        Permission.Calendar -> CalendarPermissionHandler()
+        Permission.Motion -> MotionPermissionHandler()
+        Permission.SpeechRecognition -> SpeechRecognitionPermissionHandler()
+        Permission.Storage, Permission.Nfc -> throw PermissionException.UnsupportedPermission(permission, "iOS")
+    }
+
+    actual override fun status(permission: Permission): PermissionStatus {
+        InfoPlistChecker.requireDeclared(permission)
+        return handlerFor(permission).status()
+    }
+
+    actual override suspend fun request(permissions: Set<Permission>): Map<Permission, PermissionStatus> {
+        permissions.forEach(InfoPlistChecker::requireDeclared)
+        return permissions.associateWith { handlerFor(it).request() }
+    }
+
+    actual override fun openSettings() {
+        val url = NSURL.URLWithString(UIApplicationOpenSettingsURLString) ?: return
+        UIApplication.sharedApplication.openURL(url, options = emptyMap<Any?, Any>()) {}
+    }
+}

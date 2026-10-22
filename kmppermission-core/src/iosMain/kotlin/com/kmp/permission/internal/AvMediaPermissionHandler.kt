@@ -1,0 +1,38 @@
+package com.kmp.permission.internal
+
+import com.kmp.permission.PermissionStatus
+import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.AVFoundation.AVAuthorizationStatus
+import platform.AVFoundation.AVAuthorizationStatusAuthorized
+import platform.AVFoundation.AVAuthorizationStatusDenied
+import platform.AVFoundation.AVAuthorizationStatusNotDetermined
+import platform.AVFoundation.AVAuthorizationStatusRestricted
+import platform.AVFoundation.AVCaptureDevice
+import platform.AVFoundation.AVMediaType
+import platform.AVFoundation.authorizationStatusForMediaType
+import platform.AVFoundation.requestAccessForMediaType
+import kotlin.coroutines.resume
+
+/** Camera and microphone both live under `AVCaptureDevice`, differing only by [mediaType]. */
+internal class AvMediaPermissionHandler(private val mediaType: AVMediaType) : IosPermissionHandler {
+
+    override fun status(): PermissionStatus = map(AVCaptureDevice.authorizationStatusForMediaType(mediaType))
+
+    override suspend fun request(): PermissionStatus {
+        if (AVCaptureDevice.authorizationStatusForMediaType(mediaType) != AVAuthorizationStatusNotDetermined) {
+            return status()
+        }
+        suspendCancellableCoroutine<Unit> { continuation ->
+            AVCaptureDevice.requestAccessForMediaType(mediaType) { continuation.resume(Unit) }
+        }
+        return status()
+    }
+
+    private fun map(status: AVAuthorizationStatus): PermissionStatus = when (status) {
+        AVAuthorizationStatusNotDetermined -> PermissionStatus.NotDetermined
+        AVAuthorizationStatusRestricted -> PermissionStatus.Restricted
+        AVAuthorizationStatusDenied -> PermissionStatus.PermanentlyDenied
+        AVAuthorizationStatusAuthorized -> PermissionStatus.Granted
+        else -> PermissionStatus.Denied
+    }
+}

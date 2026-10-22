@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This sample uses the camera to demonstrate KMPermission's Camera permission.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This sample uses the microphone to demonstrate KMPermission's Microphone permission.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This sample uses Bluetooth to demonstrate KMPermission's Bluetooth permission.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This sample uses your location to demonstrate KMPermission's Location permission.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This sample uses your location in the background to demonstrate KMPermission's Background Location permission.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This sample uses your contacts to demonstrate KMPermission's Contacts permission.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>This sample uses your calendar to demonstrate KMPermission's Calendar permission.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This sample uses your photo library to demonstrate KMPermission's Photos permission.</string>
+</dict>
+</plist>
