@@ -1,30 +1,32 @@
 package com.kmp.permission.compose
 
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import com.kmp.permission.Permission
 import com.kmp.permission.PermissionStatus
 
 /**
- * A ready-made [Button] that requests [permission] on click and reports [onGranted] whenever the
+ * A clickable area that requests [permission] on click and reports [onGranted] whenever the
  * permission becomes [PermissionStatus.Granted] — including if it was already granted before this
  * composable first appeared.
+ *
+ * It draws nothing itself and has the accessibility role of a button, so it works with any design
+ * system: put your own styled content inside, or apply your button's styling through [modifier].
  */
 @Composable
-fun PermissionButton(
+public fun PermissionButton(
     permission: Permission,
     onGranted: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: ButtonColors = ButtonDefaults.buttonColors(),
-    content: @Composable RowScope.() -> Unit,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     val state = rememberPermissionState(permission)
     val currentOnGranted by rememberUpdatedState(onGranted)
@@ -33,11 +35,8 @@ fun PermissionButton(
         if (state.status == PermissionStatus.Granted) currentOnGranted()
     }
 
-    Button(
-        onClick = state::launchPermissionRequest,
-        modifier = modifier,
-        enabled = enabled,
-        colors = colors,
+    Box(
+        modifier = modifier.clickable(enabled = enabled, role = Role.Button, onClick = state::launchPermissionRequest),
         content = content,
     )
 }

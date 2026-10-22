@@ -14,7 +14,7 @@ A Kotlin Multiplatform library for checking, requesting and observing runtime pe
 | Module | Contents |
 |---|---|
 | `kmppermission-core` | `PermissionManager`, `Permission`, `PermissionStatus`, and the Android and iOS engines. iOS framework: `KMPPermissionCore`. |
-| `kmppermission-compose` | `rememberPermissionState`, `rememberMultiplePermissions`, `rememberPermissionLauncher`, `PermissionEffect`, `PermissionButton`. Depends on core via `api`. |
+| `kmppermission-compose` | `rememberPermissionState`, `rememberMultiplePermissions`, `rememberPermissionLauncher`, `PermissionEffect`, `PermissionButton` (a style-free clickable area; bring your own design system). Depends on core via `api` and on Compose runtime and foundation only. |
 | `sample-android` | Compose sample app. |
 | `sample-ios` | SwiftUI sample app using `KMPPermissionCore` (open `sample-ios/iosApp.xcodeproj`). |
 
@@ -169,7 +169,7 @@ Known limitations:
 - A request still waiting when its Android Activity is destroyed is cancelled (`CancellationException`), not resumed.
 
 Planned:
-- Publishing (Maven Central or an internal repository, with an XCFramework or Swift package for iOS), `explicitApi()` and binary-compatibility checks, and moving off the pre-release material3 and lifecycle dependencies.
+- Publishing to Maven Central, optionally with an XCFramework or Swift package for Swift-only iOS apps.
 - An instrumented Android UI test suite matching the iOS one, plus Compose and Robolectric tests.
 - A Compose sample for iOS.
 
