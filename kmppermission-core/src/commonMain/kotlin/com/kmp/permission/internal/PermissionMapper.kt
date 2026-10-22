@@ -7,7 +7,7 @@ import com.kmp.permission.Permission
  * identifier(s) — Android manifest permission strings, iOS `Info.plist` usage-description keys — it
  * requires there.
  *
- * Centralizing this here means the Android and iOS runtime engines (Milestones 4 and 5) consume one
+ * Centralizing this here means the Android and iOS runtime engines consume one
  * shared source of truth instead of redeclaring these strings themselves.
  */
 internal object PermissionMapper {

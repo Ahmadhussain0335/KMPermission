@@ -8,9 +8,9 @@ package com.kmp.permission
  * Application code never needs to know those identifiers; declaring [Permission.Camera] is enough
  * regardless of platform, as long as the corresponding manifest/plist entry is also present.
  *
- * [Permission] is `sealed` rather than an `enum class` so the library can grow new cases across minor
- * releases without breaking binary compatibility of `when` expressions that already cover an `else`
- * branch.
+ * [Permission] is `sealed` rather than an `enum class` so cases can carry their own documentation and
+ * the type can grow. Adding a case is still source-breaking for exhaustive `when` expressions that
+ * have no `else` branch.
  *
  * @property group the category this permission belongs to.
  */

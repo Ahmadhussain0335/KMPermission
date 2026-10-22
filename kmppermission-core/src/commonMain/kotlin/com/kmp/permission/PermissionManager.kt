@@ -10,8 +10,9 @@ package com.kmp.permission
  * interpreting the result, detecting a permanent denial, reacting to a Settings-app change — is
  * handled here.
  *
- * A concrete instance is obtained from a platform-specific factory (Android needs a live
- * `ComponentActivity`; iOS does not) introduced alongside the runtime engines in later milestones.
+ * A concrete instance is obtained from the platform factory: `PermissionManager(activity)` on
+ * Android, `PermissionManager()` on iOS. Compose code uses the `kmppermission-compose` functions
+ * instead, which create one automatically.
  */
 interface PermissionManager : PermissionObserver {
 
