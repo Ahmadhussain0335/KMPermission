@@ -1,6 +1,6 @@
 # KMPermission: Project Status
 
-Last updated: 2026-10-22. Branch `fix/stability-pass` (23 commits on top of the `main` baseline). Not pushed; there is no remote yet.
+Last updated: 2026-10-22. All work is on `main` at https://github.com/Ahmadhussain0335/KMPermission. CI runs on every push to `main` and every pull request.
 
 ## 1. Where things stand
 
@@ -9,27 +9,39 @@ Last updated: 2026-10-22. Branch `fix/stability-pass` (23 commits on top of the 
 | Common API | 19 permissions (BluetoothAdvertise, NearbyWifiDevices and LocalNetwork added); 6 statuses, including the new `Limited`; check / request / observe / openSettings. |
 | Android engine | Done. SDK-gated for API 26–36. |
 | iOS engine | Done. Minimum iOS 15. |
-| Compose layer | Done. Android verified by the sample; iOS compiles but has never been run. |
-| Samples | Android (Compose) and iOS (SwiftUI); both build. |
-| Tests | 62 host tests: 13 manager, 7 mapper, 27 Android mapper, 9 Android status rules, 3 registry, 3 validator. All passing. |
+| Compose layer | Done. Android verified on a device through the sample; iOS compiles but has never been run. |
+| Samples | Android (Compose) and iOS (SwiftUI); both build and were exercised on real devices. |
+| Tests | 64 host tests (also run on the iOS simulator in CI): 13 manager, 7 mapper, 27 Android mapper, 11 Android status rules, 3 registry, 3 validator. 10 iOS device UI tests in `sample-ios/iosAppUITests`. All passing. |
 | Docs | README rewritten: setup table, usage, platform notes. |
-| Publishing / CI | Not started (deferred by decision). |
+| CI | GitHub Actions: Android tests, lint and sample; common tests on the iOS simulator; iOS framework, sample and UI-test build. |
+| Publishing | Not started (deferred by decision). |
 
-**Verified on 2026-10-22** (Intel Mac, offline):
-- Gradle, clean rebuild (`--rerun-tasks`):
-  - All host tests pass.
-  - core and compose compile for Android, iosArm64 and iosSimulatorArm64.
-  - iOS test sources compile.
-  - The debug iosArm64 framework links.
-  - `sample-android:assembleDebug` builds.
-  - `lintDebug` reports 0 errors and 6 warnings.
-- Xcode 16.3: `sample-ios` builds for a generic iOS device with signing disabled.
-- Android device (SM-A536E, Android 16): the sample installs and launches without a crash. The UI was not exercised because the phone was locked.
+**Verified on 2026-10-22:**
+- Gradle and Xcode builds as listed above, locally and in CI (both jobs green).
+- **Samsung Galaxy A53 (SM-A536E), Android 16**, driven through the sample with adb:
+
+| Scenario | Result |
+|---|---|
+| Deny, deny again, request a third time | Denied, then Blocked; the third request auto-denied without a dialog |
+| Dismiss the dialog with Back, twice | Stays Denied |
+| Approximate location, then upgrade to precise | Limited, then Granted |
+| Background location from scratch | Foreground prompt, Settings page, Granted |
+| Selected photos | Limited |
+| Bluetooth, Advertise, Nearby Wi-Fi, Notifications, Contacts, Calendar | Granted (Advertise and Wi-Fi without a prompt: Android grants the Nearby devices group together) |
+| Storage, NFC | Granted, no prompt |
+| Allow, then revoke, in Settings | Granted on return; after revoke Denied, and the dialog shows again |
+| Rotate while a dialog is open | No crash; Granted |
+
+- **iPhone 13, iOS 26.6**, via `iosAppUITests` (10/10 passing in one run): camera denial, microphone, approximate location (Limited), declining the Always upgrade without hanging, When In Use followed by the Always upgrade, Bluetooth and Advertise, Contacts with the iOS 18+ sharing sheet, Calendar, Photos, Notifications/Motion/Speech, and a camera grant in Settings picked up on return.
+
+**Bugs found on the devices, fixed and re-verified:**
+- `c7c57fe` Android: a fresh install showed Background Location as Denied, because Android reports a rationale for it before it is ever requested.
+- `8fa8e91` iOS: status was read from a second `CLLocationManager` that lags behind the delegate manager, so requesting background location right after When In Use skipped the Always prompt.
+- `abfb51f` iOS: right after "Allow Full Access", EventKit still reported NotDetermined, so `request(Calendar)` returned NotDetermined. Handlers now fall back to the answer the prompt's completion reported.
 
 **Not verified:**
-- No iOS runtime behaviour has been exercised. This machine cannot run an arm64 simulator, and no iPhone was available.
-- No permission dialog flow has been driven on a device.
-- The iOS prompt-detection logic and the Android 500 ms auto-deny threshold therefore still need a manual pass on real hardware (see section 4).
+- Android below API 33 (Bluetooth location mapping, Nearby Wi-Fi fallback, notifications setting) and Android 17 (`LocalNetwork`): no such devices were connected.
+- iOS: Location Services turned off system-wide, "Allow Once", and the limited Photos/Contacts pickers (the tests choose full access).
 
 ## 2. Done in this pass
 
@@ -90,14 +102,12 @@ Decided afterwards: BLE scanning below API 31 now requires location permission. 
    - Choose Maven Central, an internal repository, or source-only.
    - Then add `maven-publish` and signing, `explicitApi()`, the binary-compatibility validator, and an XCFramework/SPM if needed.
    - Move off the alpha/beta dependencies: material3 `1.11.0-alpha07` and lifecycle `2.11.0-beta01`.
-2. **CI**: GitHub Actions or GitLab CI depends on where the repo will live. Plan: host tests and assemble on every MR, plus an iOS job on an arm64 runner or Xcode Cloud.
-3. **SDK**: compileSdk 37 still depends on `android.suppressUnsupportedCompileSdk`. targetSdk stays at 36 until you approve 37.
+2. **SDK**: compileSdk 37 still depends on `android.suppressUnsupportedCompileSdk`. targetSdk stays at 36 until you approve 37.
 
 ### Work that can proceed
-- **Manual device test pass** on real devices:
-  - iOS: the location When In Use → Always sequence, including "Allow Once", "Keep While Using" and Location Services off; Bluetooth; Notifications.
-  - Android: a dismissed dialog, "Don't allow" twice, background location on API 30+, selected photos on API 34+, rotation during a dialog, Bluetooth on an API 30 or older device (location prompt), Nearby Wi-Fi on API 33+ and below, LocalNetwork on an Android 17 device once the sample targets SDK 37.
-- **iOS tests**: `iosTest` is empty, and they need an Apple-silicon Mac.
+- **Remaining device coverage**: an Android 12 or older device (Bluetooth location prompt, Nearby Wi-Fi fallback), an Android 17 device once the sample targets SDK 37 (LocalNetwork), and on iOS "Allow Once", Location Services off, and the limited Photos/Contacts pickers.
+- **Android device tests in the repo**: the Android pass was driven by hand through adb; an instrumented UI Automator suite like the iOS one would make it repeatable.
+- **iOS unit tests**: `iosTest` is empty; the shared tests already run on the simulator in CI.
 - **Android engine tests** with Robolectric: the controller and the store. The decision logic is already covered by `AndroidStatusRulesTest`.
 - **Compose tests**: none yet; they need the compose ui-test dependency.
 - **Compose iOS sample**: the Compose layer has never run on iOS.
@@ -106,7 +116,7 @@ Decided afterwards: BLE scanning below API 31 now requires location permission. 
 ### Housekeeping (for you)
 - Template modules not in the build: `androidApp/`, `sharedLogic/`, `sharedUI/`, `iosApp/`. The `iosApp` Xcode project cannot build because it references `:sharedLogic`. I have not deleted them.
 - sample-android sources live in `.../sample/` but declare package `...sample.android`. Moving them is a rename, left to you.
-- Set your team in `sample-ios/Configuration/Config.xcconfig` before building for a device or Xcode Cloud.
+- Set your team in `sample-ios/Configuration/Config.xcconfig` (or pass `TEAM_ID=` to `xcodebuild`) before building for a device. The device run used your Personal Team on the command line; no team ID is committed.
 - No LICENSE or CHANGELOG yet.
 
 ## 4. Known limitations and heuristics
