@@ -10,6 +10,8 @@ enum class PermissionGroup {
     Camera,
     Microphone,
     Bluetooth,
+    /** Wi-Fi discovery and local network access. */
+    Network,
     Location,
     Notifications,
     Contacts,

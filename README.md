@@ -44,6 +44,7 @@ Declare what you use; the library checks and fails with a message naming the mis
 | `BluetoothScan` | API 31+: `BLUETOOTH_SCAN`. API 29-30: `ACCESS_FINE_LOCATION`. API 26-28: `ACCESS_COARSE_LOCATION` | `NSBluetoothAlwaysUsageDescription` |
 | `BluetoothConnect` | `BLUETOOTH_CONNECT` (API 31+) | `NSBluetoothAlwaysUsageDescription` |
 | `BluetoothAdvertise` | `BLUETOOTH_ADVERTISE` (API 31+) | `NSBluetoothAlwaysUsageDescription` |
+| `NearbyWifiDevices` | API 33+: `NEARBY_WIFI_DEVICES` (add `usesPermissionFlags="neverForLocation"` if you never derive location). Below API 33: `ACCESS_FINE_LOCATION` | not supported |
 | `LocationFine` | `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` | `NSLocationWhenInUseUsageDescription` |
 | `LocationCoarse` | `ACCESS_COARSE_LOCATION` | `NSLocationWhenInUseUsageDescription` |
 | `LocationBackground` | `ACCESS_BACKGROUND_LOCATION` and a foreground location permission | `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription` |

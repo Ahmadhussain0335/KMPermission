@@ -179,4 +179,21 @@ class AndroidPermissionMapperTest {
         assertTrue(AndroidPermissionMapper.isAutoGranted(Permission.BluetoothAdvertise, sdkInt = 30))
         assertTrue(AndroidPermissionMapper.manifestPermissions(Permission.BluetoothAdvertise, sdkInt = 30).isEmpty())
     }
+
+    @Test
+    fun nearbyWifiDevices_requiresOwnPermission_fromApi33() {
+        assertEquals(
+            listOf("android.permission.NEARBY_WIFI_DEVICES"),
+            AndroidPermissionMapper.manifestPermissions(Permission.NearbyWifiDevices, sdkInt = Build.VERSION_CODES.TIRAMISU),
+        )
+    }
+
+    @Test
+    fun nearbyWifiDevices_requiresFineLocation_belowApi33() {
+        assertFalse(AndroidPermissionMapper.isAutoGranted(Permission.NearbyWifiDevices, sdkInt = 32))
+        assertEquals(
+            listOf("android.permission.ACCESS_FINE_LOCATION"),
+            AndroidPermissionMapper.manifestPermissions(Permission.NearbyWifiDevices, sdkInt = 32),
+        )
+    }
 }

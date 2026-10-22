@@ -44,7 +44,7 @@ internal actual class PermissionController actual constructor() : PermissionEngi
         Permission.Calendar -> CalendarPermissionHandler()
         Permission.Motion -> MotionPermissionHandler()
         Permission.SpeechRecognition -> SpeechRecognitionPermissionHandler()
-        Permission.Storage, Permission.Nfc -> throw PermissionException.UnsupportedPermission(permission, "iOS")
+        Permission.Storage, Permission.Nfc, Permission.NearbyWifiDevices -> throw PermissionException.UnsupportedPermission(permission, "iOS")
     }
 
     actual override fun status(permission: Permission): PermissionStatus {

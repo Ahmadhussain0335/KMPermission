@@ -53,6 +53,10 @@ internal object AndroidPermissionMapper {
             Permission.BluetoothConnect, Permission.BluetoothAdvertise ->
                 if (sdkInt >= Build.VERSION_CODES.S) PermissionMapper.androidManifestPermissions(permission) else emptyList()
 
+            // Below API 33 the Wi-Fi discovery APIs are guarded by fine location instead.
+            Permission.NearbyWifiDevices ->
+                if (sdkInt >= Build.VERSION_CODES.TIRAMISU) PermissionMapper.androidManifestPermissions(permission) else listOf(ACCESS_FINE_LOCATION)
+
             // Below API 33 notifications have no runtime permission; see PermissionStatusResolver.
             Permission.Notifications ->
                 if (sdkInt >= Build.VERSION_CODES.TIRAMISU) PermissionMapper.androidManifestPermissions(permission) else emptyList()

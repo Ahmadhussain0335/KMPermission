@@ -47,6 +47,13 @@ sealed class Permission(val group: PermissionGroup) {
     data object BluetoothAdvertise : Permission(PermissionGroup.Bluetooth)
 
     /**
+     * Discovering and connecting to nearby devices over Wi-Fi (Wi-Fi Direct, Wi-Fi Aware, scan
+     * results, local-only hotspots). Android API 33+: `NEARBY_WIFI_DEVICES`; below that these APIs
+     * need `ACCESS_FINE_LOCATION`, which this maps to. Unsupported on iOS.
+     */
+    data object NearbyWifiDevices : Permission(PermissionGroup.Network)
+
+    /**
      * Precise device location. Android: `ACCESS_FINE_LOCATION`, plus `ACCESS_COARSE_LOCATION` on API
      * 31+, which the system requires in the same request. iOS: `NSLocationWhenInUseUsageDescription`.
      * Reported as [PermissionStatus.Limited] when the user allowed only approximate location.
