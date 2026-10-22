@@ -58,6 +58,7 @@ internal actual class PermissionController actual constructor() : PermissionEngi
      * after that point. The registry's own `register` has no such restriction.
      */
     fun attach(activity: ComponentActivity) {
+        AndroidPermissionMapper.appTargetSdk = activity.applicationInfo.targetSdkVersion
         lateinit var boundHost: Host
         val launcher = activity.activityResultRegistry.register(
             "com.kmp.permission.request_multiple_permissions_${launcherKeySequence.getAndIncrement()}",

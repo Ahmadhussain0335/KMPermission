@@ -196,4 +196,25 @@ class AndroidPermissionMapperTest {
             AndroidPermissionMapper.manifestPermissions(Permission.NearbyWifiDevices, sdkInt = 32),
         )
     }
+
+    @Test
+    fun localNetwork_isEnforced_onAndroid17_whenAppTargets37() {
+        assertFalse(AndroidPermissionMapper.isAutoGranted(Permission.LocalNetwork, sdkInt = 37, targetSdkInt = 37))
+        assertEquals(
+            listOf("android.permission.ACCESS_LOCAL_NETWORK"),
+            AndroidPermissionMapper.manifestPermissions(Permission.LocalNetwork, sdkInt = 37, targetSdkInt = 37),
+        )
+    }
+
+    @Test
+    fun localNetwork_isImplicitlyGranted_onAndroid17_whenAppTargetsBelow37() {
+        assertTrue(AndroidPermissionMapper.isAutoGranted(Permission.LocalNetwork, sdkInt = 37, targetSdkInt = 36))
+        assertTrue(AndroidPermissionMapper.manifestPermissions(Permission.LocalNetwork, sdkInt = 37, targetSdkInt = 36).isEmpty())
+    }
+
+    @Test
+    fun localNetwork_isGranted_belowAndroid17_whateverTheTarget() {
+        assertTrue(AndroidPermissionMapper.isAutoGranted(Permission.LocalNetwork, sdkInt = 36, targetSdkInt = 37))
+        assertTrue(AndroidPermissionMapper.manifestPermissions(Permission.LocalNetwork, sdkInt = 36, targetSdkInt = 37).isEmpty())
+    }
 }

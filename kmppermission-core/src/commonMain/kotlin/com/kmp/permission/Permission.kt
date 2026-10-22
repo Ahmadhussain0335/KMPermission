@@ -54,6 +54,17 @@ sealed class Permission(val group: PermissionGroup) {
     data object NearbyWifiDevices : Permission(PermissionGroup.Network)
 
     /**
+     * Connecting to devices on the local network (TCP/UDP to local addresses, multicast, mDNS).
+     * Android 17+ for apps targeting SDK 37+: `ACCESS_LOCAL_NETWORK`. Apps targeting a lower SDK get
+     * an implicit grant, so this is [PermissionStatus.Granted] for them and on older Android; do not
+     * declare `ACCESS_LOCAL_NETWORK` until the app targets SDK 37.
+     *
+     * Unsupported on iOS: there is no API to read local network authorization. iOS shows its prompt
+     * (`NSLocalNetworkUsageDescription`) on the first local network connection; handle failures there.
+     */
+    data object LocalNetwork : Permission(PermissionGroup.Network)
+
+    /**
      * Precise device location. Android: `ACCESS_FINE_LOCATION`, plus `ACCESS_COARSE_LOCATION` on API
      * 31+, which the system requires in the same request. iOS: `NSLocationWhenInUseUsageDescription`.
      * Reported as [PermissionStatus.Limited] when the user allowed only approximate location.

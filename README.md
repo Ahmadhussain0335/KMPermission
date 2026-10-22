@@ -45,6 +45,7 @@ Declare what you use; the library checks and fails with a message naming the mis
 | `BluetoothConnect` | `BLUETOOTH_CONNECT` (API 31+) | `NSBluetoothAlwaysUsageDescription` |
 | `BluetoothAdvertise` | `BLUETOOTH_ADVERTISE` (API 31+) | `NSBluetoothAlwaysUsageDescription` |
 | `NearbyWifiDevices` | API 33+: `NEARBY_WIFI_DEVICES` (add `usesPermissionFlags="neverForLocation"` if you never derive location). Below API 33: `ACCESS_FINE_LOCATION` | not supported |
+| `LocalNetwork` | Android 17+ when the app targets SDK 37+: `ACCESS_LOCAL_NETWORK`. Do not declare it before targeting 37; until then it reports `Granted` | not supported (see iOS notes) |
 | `LocationFine` | `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` | `NSLocationWhenInUseUsageDescription` |
 | `LocationCoarse` | `ACCESS_COARSE_LOCATION` | `NSLocationWhenInUseUsageDescription` |
 | `LocationBackground` | `ACCESS_BACKGROUND_LOCATION` and a foreground location permission | `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription` |
@@ -109,6 +110,7 @@ fun CameraScreen() {
 ### Android
 
 - `LocationBackground` is requested on its own after foreground location, and foreground location is asked for first if it isn't granted. On API 30+ the system shows a Settings page for it. Below API 29 foreground location covers it.
+- `LocalNetwork` is only enforced on Android 17+ for apps targeting SDK 37+. When it is, a grant of another Nearby devices permission (Bluetooth Scan/Connect/Advertise, Nearby Wi-Fi) may cover it without a new prompt. On Android 16 the restriction is an opt-in developer compat flag (`RESTRICT_LOCAL_NETWORK`) and is not reflected by the library.
 - `Storage` reports `Granted` on API 33+, where no storage permission exists. Use `Photos` or the system pickers for media.
 - `Notifications` below API 33 reflects whether notifications are enabled in Settings.
 - `Denied` versus `PermanentlyDenied` relies on a small history the library keeps in SharedPreferences (`com.kmp.permission.requested_permissions`). Exclude it from backup; see `sample-android/src/main/res/xml/`. Otherwise a restored install reports never-requested permissions as permanently denied.
@@ -119,6 +121,7 @@ fun CameraScreen() {
 - Requires iOS 15 or later (the Kotlin/Native framework's minimum).
 - `LocationFine` reports `Limited` when Precise Location is off. Requesting again does not change that; the user has to turn Precise Location on in Settings. The library does not request temporary full accuracy.
 - `Bluetooth`, `BluetoothScan`, `BluetoothConnect` and `BluetoothAdvertise` share one Core Bluetooth authorization.
+- `LocalNetwork` is not supported. iOS has no API to read local network authorization; it shows its prompt on the app's first local network connection. Add `NSLocalNetworkUsageDescription` (and `NSBonjourServices` for any Bonjour types you browse or publish) and handle connection failures there.
 
 ## Building and testing
 

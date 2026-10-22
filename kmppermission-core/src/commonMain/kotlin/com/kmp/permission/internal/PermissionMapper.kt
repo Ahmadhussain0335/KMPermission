@@ -21,6 +21,7 @@ internal object PermissionMapper {
         Permission.BluetoothConnect,
         Permission.BluetoothAdvertise,
         Permission.NearbyWifiDevices,
+        Permission.LocalNetwork,
         Permission.LocationFine,
         Permission.LocationCoarse,
         Permission.LocationBackground,
@@ -46,6 +47,7 @@ internal object PermissionMapper {
         Permission.BluetoothConnect -> "bluetooth_connect"
         Permission.BluetoothAdvertise -> "bluetooth_advertise"
         Permission.NearbyWifiDevices -> "nearby_wifi_devices"
+        Permission.LocalNetwork -> "local_network"
         Permission.LocationFine -> "location_fine"
         Permission.LocationCoarse -> "location_coarse"
         Permission.LocationBackground -> "location_background"
@@ -61,7 +63,7 @@ internal object PermissionMapper {
 
     /** The platforms [permission] exists on at all. */
     fun supportedPlatforms(permission: Permission): Set<Platform> = when (permission) {
-        Permission.Nfc, Permission.Storage, Permission.NearbyWifiDevices -> setOf(Platform.Android)
+        Permission.Nfc, Permission.Storage, Permission.NearbyWifiDevices, Permission.LocalNetwork -> setOf(Platform.Android)
         Permission.Motion, Permission.SpeechRecognition -> setOf(Platform.Ios)
         else -> setOf(Platform.Android, Platform.Ios)
     }
@@ -75,6 +77,7 @@ internal object PermissionMapper {
         Permission.BluetoothConnect -> listOf("android.permission.BLUETOOTH_CONNECT")
         Permission.BluetoothAdvertise -> listOf("android.permission.BLUETOOTH_ADVERTISE")
         Permission.NearbyWifiDevices -> listOf("android.permission.NEARBY_WIFI_DEVICES")
+        Permission.LocalNetwork -> listOf("android.permission.ACCESS_LOCAL_NETWORK")
         Permission.LocationFine -> listOf("android.permission.ACCESS_FINE_LOCATION")
         Permission.LocationCoarse -> listOf("android.permission.ACCESS_COARSE_LOCATION")
         Permission.LocationBackground -> listOf("android.permission.ACCESS_BACKGROUND_LOCATION")
@@ -110,7 +113,7 @@ internal object PermissionMapper {
         Permission.Storage -> emptyList()
         Permission.Photos -> listOf("NSPhotoLibraryUsageDescription")
         Permission.Nfc -> emptyList()
-        Permission.NearbyWifiDevices -> emptyList()
+        Permission.NearbyWifiDevices, Permission.LocalNetwork -> emptyList()
         Permission.Motion -> listOf("NSMotionUsageDescription")
         Permission.SpeechRecognition -> listOf("NSSpeechRecognitionUsageDescription")
     }

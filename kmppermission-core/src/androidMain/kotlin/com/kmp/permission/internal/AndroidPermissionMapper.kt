@@ -8,6 +8,9 @@ private const val ACCESS_COARSE_LOCATION = "android.permission.ACCESS_COARSE_LOC
 private const val READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE"
 private const val READ_MEDIA_VISUAL_USER_SELECTED = "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
 
+/** Android 17, where local network access becomes a runtime permission for apps targeting it. */
+private const val API_37 = 37
+
 /**
  * Layers Android SDK-version gating on top of the platform-agnostic [PermissionMapper].
  *
@@ -19,10 +22,21 @@ private const val READ_MEDIA_VISUAL_USER_SELECTED = "android.permission.READ_MED
 internal object AndroidPermissionMapper {
 
     /**
+     * The host app's `targetSdkVersion`, which decides whether [Permission.LocalNetwork] is enforced.
+     * Set by [PermissionController.attach]; every check happens after that.
+     */
+    @Volatile
+    var appTargetSdk: Int = 0
+
+    /**
      * Manifest permission string(s) that must all be declared and granted for [permission] to be
      * [com.kmp.permission.PermissionStatus.Granted] on [sdkInt]. Empty if none apply there.
      */
-    fun manifestPermissions(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): List<String> =
+    fun manifestPermissions(
+        permission: Permission,
+        sdkInt: Int = Build.VERSION.SDK_INT,
+        targetSdkInt: Int = appTargetSdk,
+    ): List<String> =
         when (permission) {
             Permission.Photos ->
                 if (sdkInt >= Build.VERSION_CODES.TIRAMISU) {
@@ -56,6 +70,10 @@ internal object AndroidPermissionMapper {
             // Below API 33 the Wi-Fi discovery APIs are guarded by fine location instead.
             Permission.NearbyWifiDevices ->
                 if (sdkInt >= Build.VERSION_CODES.TIRAMISU) PermissionMapper.androidManifestPermissions(permission) else listOf(ACCESS_FINE_LOCATION)
+
+            // Must not be declared or requested before the app targets SDK 37.
+            Permission.LocalNetwork ->
+                if (isLocalNetworkEnforced(sdkInt, targetSdkInt)) PermissionMapper.androidManifestPermissions(permission) else emptyList()
 
             // Below API 33 notifications have no runtime permission; see PermissionStatusResolver.
             Permission.Notifications ->
@@ -105,8 +123,13 @@ internal object AndroidPermissionMapper {
      * True if [permission] needs no system prompt on [sdkInt] and is always available: either it's
      * a normal (install-time) permission there, or there is nothing left to grant at that level.
      */
-    fun isAutoGranted(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): Boolean =
+    fun isAutoGranted(
+        permission: Permission,
+        sdkInt: Int = Build.VERSION.SDK_INT,
+        targetSdkInt: Int = appTargetSdk,
+    ): Boolean =
         when (permission) {
+            Permission.LocalNetwork -> !isLocalNetworkEnforced(sdkInt, targetSdkInt)
             Permission.BluetoothConnect, Permission.BluetoothAdvertise -> sdkInt < Build.VERSION_CODES.S
             Permission.Storage -> sdkInt >= Build.VERSION_CODES.TIRAMISU
             else -> false
@@ -119,6 +142,10 @@ internal object AndroidPermissionMapper {
      */
     fun requiresSeparateRequest(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): Boolean =
         permission == Permission.LocationBackground && sdkInt >= Build.VERSION_CODES.Q
+
+    // Apps targeting below SDK 37 keep an implicit grant, even on Android 17.
+    private fun isLocalNetworkEnforced(sdkInt: Int, targetSdkInt: Int): Boolean =
+        sdkInt >= API_37 && targetSdkInt >= API_37
 
     /** The location permission BLE scanning needs below API 31: fine from API 29, coarse before. */
     private fun bleScanLocationPermission(sdkInt: Int): String =
