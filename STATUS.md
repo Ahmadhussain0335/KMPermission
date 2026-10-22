@@ -1,17 +1,17 @@
 # KMPermission: Project Status
 
-Last updated: 2026-10-22. Branch `fix/stability-pass` (19 commits on top of the `main` baseline). Not pushed; there is no remote yet.
+Last updated: 2026-10-22. Branch `fix/stability-pass` (23 commits on top of the `main` baseline). Not pushed; there is no remote yet.
 
 ## 1. Where things stand
 
 | Area | State |
 |---|---|
-| Common API | 16 permissions; 6 statuses, including the new `Limited`; check / request / observe / openSettings. |
+| Common API | 19 permissions (BluetoothAdvertise, NearbyWifiDevices and LocalNetwork added); 6 statuses, including the new `Limited`; check / request / observe / openSettings. |
 | Android engine | Done. SDK-gated for API 26–36. |
 | iOS engine | Done. Minimum iOS 15. |
 | Compose layer | Done. Android verified by the sample; iOS compiles but has never been run. |
 | Samples | Android (Compose) and iOS (SwiftUI); both build. |
-| Tests | 55 host tests: 13 manager, 7 mapper, 20 Android mapper, 9 Android status rules, 3 registry, 3 validator. All passing. |
+| Tests | 62 host tests: 13 manager, 7 mapper, 27 Android mapper, 9 Android status rules, 3 registry, 3 validator. All passing. |
 | Docs | README rewritten: setup table, usage, platform notes. |
 | Publishing / CI | Not started (deferred by decision). |
 
@@ -76,23 +76,27 @@ Last updated: 2026-10-22. Branch `fix/stability-pass` (19 commits on top of the 
 
 An independent review of the branch found the issues fixed in `c5cbaa6` and `199e725`.
 
+IoT permissions added afterwards:
+- `BluetoothAdvertise` (`0136be7`): Android API 31+ `BLUETOOTH_ADVERTISE`, auto-granted below; on iOS it shares the Core Bluetooth authorization.
+- `NearbyWifiDevices` (`35647de`): Android only. API 33+ `NEARBY_WIFI_DEVICES`; below that `ACCESS_FINE_LOCATION`.
+- `LocalNetwork` (`9bdb8c3`): Android only. `ACCESS_LOCAL_NETWORK` is requested only on Android 17+ when the app targets SDK 37+; otherwise it reports Granted (implicit grant) and needs no manifest entry. Unsupported on iOS, which has no API to read local network authorization. The Android sample omits it while it targets SDK 36.
+
 Decided afterwards: BLE scanning below API 31 now requires location permission. `BluetoothScan` maps to `ACCESS_FINE_LOCATION` on API 29–30 and `ACCESS_COARSE_LOCATION` on 26–28, and `Bluetooth` includes it there.
 
 ## 3. Left to do
 
 ### Needs your decision first
-1. **IoT permissions** (deferred): BLUETOOTH_ADVERTISE, NEARBY_WIFI_DEVICES, local network access (iOS `NSLocalNetworkUsageDescription`, and Android 17, which needs checking against the current docs).
-2. **Publishing** (deferred):
+1. **Publishing** (deferred):
    - Choose Maven Central, an internal repository, or source-only.
    - Then add `maven-publish` and signing, `explicitApi()`, the binary-compatibility validator, and an XCFramework/SPM if needed.
    - Move off the alpha/beta dependencies: material3 `1.11.0-alpha07` and lifecycle `2.11.0-beta01`.
-3. **CI**: GitHub Actions or GitLab CI depends on where the repo will live. Plan: host tests and assemble on every MR, plus an iOS job on an arm64 runner or Xcode Cloud.
-4. **SDK**: compileSdk 37 still depends on `android.suppressUnsupportedCompileSdk`. targetSdk stays at 36 until you approve 37.
+2. **CI**: GitHub Actions or GitLab CI depends on where the repo will live. Plan: host tests and assemble on every MR, plus an iOS job on an arm64 runner or Xcode Cloud.
+3. **SDK**: compileSdk 37 still depends on `android.suppressUnsupportedCompileSdk`. targetSdk stays at 36 until you approve 37.
 
 ### Work that can proceed
 - **Manual device test pass** on real devices:
   - iOS: the location When In Use → Always sequence, including "Allow Once", "Keep While Using" and Location Services off; Bluetooth; Notifications.
-  - Android: a dismissed dialog, "Don't allow" twice, background location on API 30+, selected photos on API 34+, rotation during a dialog, Bluetooth on an API 30 or older device (location prompt).
+  - Android: a dismissed dialog, "Don't allow" twice, background location on API 30+, selected photos on API 34+, rotation during a dialog, Bluetooth on an API 30 or older device (location prompt), Nearby Wi-Fi on API 33+ and below, LocalNetwork on an Android 17 device once the sample targets SDK 37.
 - **iOS tests**: `iosTest` is empty, and they need an Apple-silicon Mac.
 - **Android engine tests** with Robolectric: the controller and the store. The decision logic is already covered by `AndroidStatusRulesTest`.
 - **Compose tests**: none yet; they need the compose ui-test dependency.
