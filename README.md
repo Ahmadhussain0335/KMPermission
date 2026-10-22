@@ -1,6 +1,8 @@
 # KMPermission
 
 [![CI](https://github.com/Ahmadhussain0335/KMPermission/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ahmadhussain0335/KMPermission/actions/workflows/ci.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.ahmadhussain0335/kmppermission-core)](https://central.sonatype.com/artifact/io.github.ahmadhussain0335/kmppermission-core)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 A Kotlin Multiplatform library for checking, requesting and observing runtime permissions on Android and iOS through one API, with an optional Compose Multiplatform layer.
 
@@ -22,7 +24,7 @@ The library supports Android 8.0 (API 26) and later and iOS 15 and later.
 
 ## Installation
 
-The libraries are set up for Maven Central under the group `io.github.ahmadhussain0335`. The first Maven Central release (0.2.0) is pending; until then, include the modules from source.
+The libraries are published to Maven Central under the group `io.github.ahmadhussain0335`. Make sure `mavenCentral()` is in your repositories.
 
 ```kotlin
 // build.gradle.kts of a Kotlin Multiplatform module
@@ -176,7 +178,7 @@ With a free Personal Team, trust the developer certificate on the device first (
 
 ## Project status
 
-Version 0.1.0 is tagged on GitHub; 0.2.0 will be the first Maven Central release. The API may still change before 1.0.
+The latest release is 0.2.0, the first on Maven Central. The API may still change before 1.0.
 
 Tested on real devices:
 - Samsung Galaxy A53 (Android 16): denial and permanent denial, dismissed dialogs, approximate then precise location, the background-location sequence, selected photos, the Bluetooth and Nearby Wi-Fi group, notifications, contacts, calendar, changes made in Settings, and rotation during a dialog.
@@ -190,7 +192,7 @@ Known limitations:
 - A request still waiting when its Android Activity is destroyed is cancelled (`CancellationException`), not resumed.
 
 Planned:
-- Publishing to Maven Central, optionally with an XCFramework or Swift package for Swift-only iOS apps.
+- An XCFramework or Swift package for Swift-only iOS apps.
 - An instrumented Android UI test suite matching the iOS one, plus Compose and Robolectric tests.
 - A Compose sample for iOS.
 
