@@ -2,6 +2,7 @@ package com.kmp.permission.internal
 
 import com.kmp.permission.Permission
 import com.kmp.permission.PermissionStatus
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Abstraction [DefaultPermissionManager] delegates the real permission work to.
@@ -18,4 +19,10 @@ internal interface PermissionEngine {
     suspend fun request(permissions: Set<Permission>): Map<Permission, PermissionStatus>
 
     fun openSettings()
+
+    /**
+     * Emits each time the app returns to the foreground, which is when a change made in system
+     * Settings becomes visible. Neither platform notifies apps of permission changes directly.
+     */
+    val foregroundEvents: Flow<Unit>
 }

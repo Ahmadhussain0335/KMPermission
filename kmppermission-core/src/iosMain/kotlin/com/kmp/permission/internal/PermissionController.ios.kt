@@ -4,6 +4,9 @@ import com.kmp.permission.Permission
 import com.kmp.permission.PermissionException
 import com.kmp.permission.PermissionStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -55,6 +58,13 @@ internal actual class PermissionController actual constructor() : PermissionEngi
         return withContext(Dispatchers.Main) {
             requestMutex.withLock { permissions.associateWith { handlerFor(it).request() } }
         }
+    }
+
+    actual override val foregroundEvents: Flow<Unit> = callbackFlow {
+        val removeObservers = observeAppActivity { event ->
+            if (event == AppActivityEvent.DidBecomeActive) trySend(Unit)
+        }
+        awaitClose { removeObservers() }
     }
 
     actual override fun openSettings() {

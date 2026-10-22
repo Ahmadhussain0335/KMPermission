@@ -6,7 +6,9 @@ import com.kmp.permission.PermissionResult
 import com.kmp.permission.PermissionStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 
 /**
@@ -67,15 +69,24 @@ internal class DefaultPermissionManager(
 
     override fun observe(permission: Permission): Flow<PermissionStatus> {
         PermissionValidator.requireSupported(permission)
-        return registry.statusFlow(permission)
-            .onStart { registry.update(permission, engine.status(permission)) }
+        val observed = setOf(permission)
+        return merge(registry.statusFlow(permission), refreshOnForeground(observed))
+            .onStart { refresh(observed) }
     }
 
     override fun observe(vararg permissions: Permission): Flow<Map<Permission, PermissionStatus>> {
         val requested = permissions.toSet()
         PermissionValidator.requireNotEmpty(requested)
         requested.forEach(PermissionValidator::requireSupported)
-        return registry.statusFlow(requested)
-            .onStart { requested.forEach { registry.update(it, engine.status(it)) } }
+        return merge(registry.statusFlow(requested), refreshOnForeground(requested))
+            .onStart { refresh(requested) }
+    }
+
+    /** Re-reads [permissions] whenever the app is foregrounded; emits nothing itself. */
+    private fun refreshOnForeground(permissions: Set<Permission>): Flow<Nothing> =
+        engine.foregroundEvents.transform { refresh(permissions) }
+
+    private fun refresh(permissions: Set<Permission>) {
+        permissions.forEach { registry.update(it, engine.status(it)) }
     }
 }

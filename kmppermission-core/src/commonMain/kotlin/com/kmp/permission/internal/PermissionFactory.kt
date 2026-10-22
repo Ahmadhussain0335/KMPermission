@@ -4,10 +4,9 @@ import com.kmp.permission.PermissionManager
 import kotlinx.coroutines.CoroutineScope
 
 /**
- * Assembles a [PermissionManager] from a platform [PermissionEngine].
- *
- * The platform-specific piece — constructing that [PermissionEngine] itself, which on Android needs
- * a live `ComponentActivity` — is wired up by the public entry points added in Milestones 4 and 5.
+ * Assembles a [PermissionManager] from a platform [PermissionEngine]. Called by the public
+ * platform factories, which construct the engine itself (on Android that needs a live
+ * `ComponentActivity`).
  */
 internal object PermissionFactory {
 

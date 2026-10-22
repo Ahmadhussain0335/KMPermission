@@ -15,6 +15,11 @@ import com.kmp.permission.PermissionException
 import com.kmp.permission.PermissionStatus
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -158,6 +163,19 @@ internal actual class PermissionController actual constructor() : PermissionEngi
             host.launcher.launch(manifestPermissions)
         }
     }
+
+    actual override val foregroundEvents: Flow<Unit>
+        get() = host?.activity?.let(::resumeEvents) ?: emptyFlow()
+
+    private fun resumeEvents(activity: ComponentActivity): Flow<Unit> = callbackFlow {
+        val observer = object : DefaultLifecycleObserver {
+            override fun onResume(owner: LifecycleOwner) {
+                trySend(Unit)
+            }
+        }
+        activity.lifecycle.addObserver(observer)
+        awaitClose { activity.lifecycle.removeObserver(observer) }
+    }.flowOn(Dispatchers.Main.immediate) // Lifecycle observers may only be added on the main thread.
 
     actual override fun openSettings() {
         val activeHost = host ?: throw PermissionException.ManagerNotAttached()

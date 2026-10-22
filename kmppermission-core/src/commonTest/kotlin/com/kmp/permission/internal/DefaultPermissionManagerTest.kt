@@ -5,7 +5,12 @@ import com.kmp.permission.PermissionException
 import com.kmp.permission.PermissionStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -34,6 +39,13 @@ class DefaultPermissionManagerTest {
 
         override fun openSettings() {
             openSettingsCallCount++
+        }
+
+        private val foreground = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+        override val foregroundEvents: Flow<Unit> = foreground
+
+        fun bringToForeground() {
+            foreground.tryEmit(Unit)
         }
     }
 
@@ -156,5 +168,51 @@ class DefaultPermissionManagerTest {
         assertFailsWith<PermissionException.UnsupportedPermission> {
             manager.observe(Permission.Camera, unsupportedPermission())
         }
+    }
+
+    @Test
+    fun observe_reemitsStatusChangedInSettings_whenAppReturnsToForeground() = runTest {
+        val engine = FakePermissionEngine().apply { seed(Permission.Camera, PermissionStatus.Denied) }
+        val manager = DefaultPermissionManager(engine, PermissionRegistry(), this)
+        val emissions = mutableListOf<PermissionStatus>()
+        val collector = launch(UnconfinedTestDispatcher(testScheduler)) { manager.observe(Permission.Camera).toList(emissions) }
+
+        engine.seed(Permission.Camera, PermissionStatus.Granted)
+        engine.bringToForeground()
+
+        assertEquals(listOf(PermissionStatus.Denied, PermissionStatus.Granted), emissions)
+        collector.cancel()
+    }
+
+    @Test
+    fun observe_batch_reemitsOnForeground() = runTest {
+        val engine = FakePermissionEngine().apply {
+            seed(Permission.Camera, PermissionStatus.Granted)
+            seed(Permission.Microphone, PermissionStatus.NotDetermined)
+        }
+        val manager = DefaultPermissionManager(engine, PermissionRegistry(), this)
+        val emissions = mutableListOf<Map<Permission, PermissionStatus>>()
+        val collector = launch(UnconfinedTestDispatcher(testScheduler)) {
+            manager.observe(Permission.Camera, Permission.Microphone).toList(emissions)
+        }
+
+        engine.seed(Permission.Microphone, PermissionStatus.PermanentlyDenied)
+        engine.bringToForeground()
+
+        assertEquals(PermissionStatus.PermanentlyDenied, emissions.last()[Permission.Microphone])
+        collector.cancel()
+    }
+
+    @Test
+    fun observe_doesNotReemit_whenForegroundFindsNoChange() = runTest {
+        val engine = FakePermissionEngine().apply { seed(Permission.Camera, PermissionStatus.Granted) }
+        val manager = DefaultPermissionManager(engine, PermissionRegistry(), this)
+        val emissions = mutableListOf<PermissionStatus>()
+        val collector = launch(UnconfinedTestDispatcher(testScheduler)) { manager.observe(Permission.Camera).toList(emissions) }
+
+        engine.bringToForeground()
+
+        assertEquals(listOf<PermissionStatus>(PermissionStatus.Granted), emissions)
+        collector.cancel()
     }
 }
