@@ -21,6 +21,8 @@ private let demoItems: [PermissionDemoItem] = [
     PermissionDemoItem(title: "Contacts", permissions: [Permission.Contacts.shared]),
     PermissionDemoItem(title: "Calendar", permissions: [Permission.Calendar.shared]),
     PermissionDemoItem(title: "Photos", permissions: [Permission.Photos.shared]),
+    PermissionDemoItem(title: "Motion", permissions: [Permission.Motion.shared]),
+    PermissionDemoItem(title: "Speech Recognition", permissions: [Permission.SpeechRecognition.shared]),
 ]
 
 private func worstStatus(_ statuses: [PermissionStatus]) -> PermissionStatus {
@@ -70,10 +72,12 @@ private final class PermissionDemoViewModel: ObservableObject {
     }
 
     func request(_ item: PermissionDemoItem) {
-        for permission in item.permissions {
-            manager.request(permission: permission) { [weak self] status in
-                guard let self else { return }
-                DispatchQueue.main.async {
+        // One batch call per row: the library resolves the permissions in order behind one prompt
+        // queue instead of racing separate requests against each other.
+        manager.request(permissions: item.permissions) { [weak self] results in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                for (permission, status) in results {
                     self.statuses[self.key(for: permission)] = status
                 }
             }
