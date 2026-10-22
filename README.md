@@ -6,10 +6,24 @@
 
 A Kotlin Multiplatform library for checking, requesting and observing runtime permissions on Android and iOS through one API, with an optional Compose Multiplatform layer.
 
+The project is called **KMPermission**; its Maven artifacts are named **`kmppermission-*`** (`kmppermission-core`, `kmppermission-compose`).
+
 - 19 permissions, including the ones IoT and gateway apps need: Bluetooth scan/connect/advertise, nearby Wi-Fi and Android 17 local network access.
 - Six statuses, including `Limited` for partial grants and a reliable `Denied` versus `PermanentlyDenied` split on Android.
 - Suspend, callback and `Flow` APIs; `observe()` picks up changes made in system Settings.
 - Handles platform differences for you: Android API 26 to 37 gating, the background-location sequence, and iOS 17/18 calendar and contacts changes.
+
+## Why KMPermission
+
+Compared with [moko-permissions](https://github.com/icerockdev/moko-permissions) (checked against its 0.20.1 release and source):
+
+- **Observing, not just asking.** `observe()` returns a `Flow` that emits again when the app returns to the foreground, so a permission changed in system Settings shows up without another request. moko-permissions' `PermissionsController` offers suspend calls (`providePermission`, `getPermissionState`, `isPermissionGranted`) and no `Flow`.
+- **A `Limited` status for partial grants:** selected photos, limited contacts, write-only calendar and approximate location. moko-permissions' `PermissionState` has no partial state; its iOS contacts code maps limited access to `Granted`.
+- **Permissions for IoT and gateway apps:** `NearbyWifiDevices` (with the location fallback below Android 13) and Android 17's `LocalNetwork`, neither of which moko-permissions has. Both libraries cover Bluetooth scan, connect and advertise.
+- **Denials are statuses; exceptions mean misconfiguration.** A denial comes back as `Denied` or `PermanentlyDenied`, while a missing manifest entry or Info.plist key is checked before any prompt and thrown as a `PermissionException` naming the entry to add. moko-permissions reports denials by throwing `DeniedException` and `DeniedAlwaysException`.
+- **Tested against real system prompts.** Besides unit tests on the Android host and the iOS simulator, an XCUITest suite answers the actual iOS permission alerts on a device (see [Device tests](#device-tests)).
+
+moko-permissions supports older systems (Android API 16+ and iOS 12+, against API 26+ and iOS 15+ here) and has a longer track record.
 
 ## Modules
 
@@ -31,9 +45,9 @@ The libraries are published to Maven Central under the group `io.github.ahmadhus
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.ahmadhussain0335:kmppermission-core:0.2.1")
+            implementation("io.github.ahmadhussain0335:kmppermission-core:0.3.0")
             // Optional Compose Multiplatform layer
-            implementation("io.github.ahmadhussain0335:kmppermission-compose:0.2.1")
+            implementation("io.github.ahmadhussain0335:kmppermission-compose:0.3.0")
         }
     }
 }
@@ -47,7 +61,7 @@ iOS apps that don't use Kotlin can add the core library as a Swift package. In X
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Ahmadhussain0335/KMPermission", from: "0.2.1"),
+    .package(url: "https://github.com/Ahmadhussain0335/KMPermission", from: "0.3.0"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: [
