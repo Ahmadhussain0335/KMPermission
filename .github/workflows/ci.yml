@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: the jobs only need to read the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Actions are pinned to commit SHAs so a moved tag cannot change what runs here.
+jobs:
+  android:
+    name: Android (tests, sample, lint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Matches gradle/gradle-daemon-jvm.properties (Amazon Corretto 21).
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: corretto
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      - name: Unit tests, library compile, sample build and lint
+        run: >
+          ./gradlew
+          :kmppermission-core:testAndroidHostTest
+          :kmppermission-compose:compileAndroidMain
+          :sample-android:assembleDebug
+          :sample-android:lintDebug
+
+      - name: Upload test and lint reports
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: android-reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
+          retention-days: 7
+
+  ios:
+    name: iOS (tests, framework, sample)
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: corretto
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      # Kotlin/Native downloads its toolchain and dependencies here on first use.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+
+      - name: Common tests on the iOS simulator, iOS compile and framework link
+        run: >
+          ./gradlew
+          :kmppermission-core:iosSimulatorArm64Test
+          :kmppermission-compose:compileKotlinIosArm64
+          :kmppermission-compose:compileKotlinIosSimulatorArm64
+          :kmppermission-core:linkDebugFrameworkIosArm64
+
+      - name: Build iOS sample (unsigned)
+        working-directory: sample-ios
+        run: >
+          xcodebuild
+          -project iosApp.xcodeproj
+          -scheme iosApp
+          -configuration Debug
+          -destination 'generic/platform=iOS'
+          CODE_SIGNING_ALLOWED=NO
+          build
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ios-reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
+          retention-days: 7
