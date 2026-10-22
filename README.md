@@ -140,7 +140,9 @@ fun CameraScreen() {
 
 Running the shared tests on the iOS simulator (`:kmppermission-core:iosSimulatorArm64Test`) locally needs an Apple-silicon Mac; CI runs them on every push. To build the iOS sample, open `sample-ios/iosApp.xcodeproj` and set your team in `sample-ios/Configuration/Config.xcconfig`, or pass `TEAM_ID=<team>` to `xcodebuild`.
 
-CI (`.github/workflows/ci.yml`) runs the host tests, lint, the shared tests on the iOS simulator, and builds both samples and the iOS UI tests on every push to `main` and every pull request.
+The public API is locked by ABI dumps in `kmppermission-core/api/` and `kmppermission-compose/api/`. `checkKotlinAbi` fails on any change to it; after an intentional API change, run `./gradlew updateKotlinAbi` and commit the updated dumps. The dumps cover the shared and iOS API; the Android-only `PermissionManager(activity)` factory is not yet covered, because Kotlin's ABI validation does not support the Android KMP library plugin.
+
+CI (`.github/workflows/ci.yml`) runs the host tests, lint, the shared tests on the iOS simulator, the ABI check, and builds both samples and the iOS UI tests on every push to `main` and every pull request.
 
 ### Device tests
 

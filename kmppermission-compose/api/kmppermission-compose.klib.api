@@ -1,0 +1,37 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <KMPermission:kmppermission-compose>
+abstract fun interface com.kmp.permission.compose/PermissionLauncher { // com.kmp.permission.compose/PermissionLauncher|null[0]
+    abstract fun launch(kotlin/Array<out com.kmp.permission/Permission>...) // com.kmp.permission.compose/PermissionLauncher.launch|launch(kotlin.Array<out|com.kmp.permission.Permission>...){}[0]
+}
+
+abstract interface com.kmp.permission.compose/MultiplePermissionsState { // com.kmp.permission.compose/MultiplePermissionsState|null[0]
+    abstract val allGranted // com.kmp.permission.compose/MultiplePermissionsState.allGranted|{}allGranted[0]
+        abstract fun <get-allGranted>(): kotlin/Boolean // com.kmp.permission.compose/MultiplePermissionsState.allGranted.<get-allGranted>|<get-allGranted>(){}[0]
+    abstract val anyGranted // com.kmp.permission.compose/MultiplePermissionsState.anyGranted|{}anyGranted[0]
+        abstract fun <get-anyGranted>(): kotlin/Boolean // com.kmp.permission.compose/MultiplePermissionsState.anyGranted.<get-anyGranted>|<get-anyGranted>(){}[0]
+    abstract val permissions // com.kmp.permission.compose/MultiplePermissionsState.permissions|{}permissions[0]
+        abstract fun <get-permissions>(): kotlin.collections/List<com.kmp.permission.compose/PermissionState> // com.kmp.permission.compose/MultiplePermissionsState.permissions.<get-permissions>|<get-permissions>(){}[0]
+
+    abstract fun launchMultiplePermissionRequest() // com.kmp.permission.compose/MultiplePermissionsState.launchMultiplePermissionRequest|launchMultiplePermissionRequest(){}[0]
+}
+
+abstract interface com.kmp.permission.compose/PermissionState { // com.kmp.permission.compose/PermissionState|null[0]
+    abstract val permission // com.kmp.permission.compose/PermissionState.permission|{}permission[0]
+        abstract fun <get-permission>(): com.kmp.permission/Permission // com.kmp.permission.compose/PermissionState.permission.<get-permission>|<get-permission>(){}[0]
+    abstract val status // com.kmp.permission.compose/PermissionState.status|{}status[0]
+        abstract fun <get-status>(): com.kmp.permission/PermissionStatus // com.kmp.permission.compose/PermissionState.status.<get-status>|<get-status>(){}[0]
+
+    abstract fun launchPermissionRequest() // com.kmp.permission.compose/PermissionState.launchPermissionRequest|launchPermissionRequest(){}[0]
+}
+
+final fun com.kmp.permission.compose/PermissionButton(com.kmp.permission/Permission, kotlin/Function0<kotlin/Unit>, androidx.compose.ui/Modifier?, kotlin/Boolean, kotlin/Function3<androidx.compose.foundation.layout/BoxScope, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int) // com.kmp.permission.compose/PermissionButton|PermissionButton(com.kmp.permission.Permission;kotlin.Function0<kotlin.Unit>;androidx.compose.ui.Modifier?;kotlin.Boolean;kotlin.Function3<androidx.compose.foundation.layout.BoxScope,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+final fun com.kmp.permission.compose/PermissionEffect(kotlin/Array<out com.kmp.permission/Permission>..., kotlin/Function1<kotlin.collections/Map<com.kmp.permission/Permission, com.kmp.permission/PermissionStatus>, kotlin/Unit>, androidx.compose.runtime/Composer?, kotlin/Int) // com.kmp.permission.compose/PermissionEffect|PermissionEffect(kotlin.Array<out|com.kmp.permission.Permission>...;kotlin.Function1<kotlin.collections.Map<com.kmp.permission.Permission,com.kmp.permission.PermissionStatus>,kotlin.Unit>;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+final fun com.kmp.permission.compose/rememberMultiplePermissions(kotlin/Array<out com.kmp.permission/Permission>..., androidx.compose.runtime/Composer?, kotlin/Int): com.kmp.permission.compose/MultiplePermissionsState // com.kmp.permission.compose/rememberMultiplePermissions|rememberMultiplePermissions(kotlin.Array<out|com.kmp.permission.Permission>...;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+final fun com.kmp.permission.compose/rememberPermissionLauncher(kotlin/Function1<kotlin.collections/Map<com.kmp.permission/Permission, com.kmp.permission/PermissionStatus>, kotlin/Unit>, androidx.compose.runtime/Composer?, kotlin/Int): com.kmp.permission.compose/PermissionLauncher // com.kmp.permission.compose/rememberPermissionLauncher|rememberPermissionLauncher(kotlin.Function1<kotlin.collections.Map<com.kmp.permission.Permission,com.kmp.permission.PermissionStatus>,kotlin.Unit>;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+final fun com.kmp.permission.compose/rememberPermissionState(com.kmp.permission/Permission, androidx.compose.runtime/Composer?, kotlin/Int): com.kmp.permission.compose/PermissionState // com.kmp.permission.compose/rememberPermissionState|rememberPermissionState(com.kmp.permission.Permission;androidx.compose.runtime.Composer?;kotlin.Int){}[0]

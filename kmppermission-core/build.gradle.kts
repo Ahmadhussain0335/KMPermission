@@ -9,6 +9,11 @@ kotlin {
     // Every public declaration must state its visibility, so nothing becomes API by accident.
     explicitApi()
 
+    // The committed api/ dumps describe the public ABI; checkKotlinAbi fails the build on any change
+    // to it that has not been recorded with updateKotlinAbi.
+    @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
+    abiValidation()
+
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }

@@ -69,10 +69,12 @@ jobs:
           path: ~/.konan
           key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
 
-      - name: Common tests on the iOS simulator, iOS compile and framework link
+      - name: Common tests on the iOS simulator, ABI check, iOS compile and framework link
         run: >
           ./gradlew
           :kmppermission-core:iosSimulatorArm64Test
+          :kmppermission-core:checkKotlinAbi
+          :kmppermission-compose:checkKotlinAbi
           :kmppermission-compose:compileKotlinIosArm64
           :kmppermission-compose:compileKotlinIosSimulatorArm64
           :kmppermission-core:linkDebugFrameworkIosArm64
