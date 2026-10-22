@@ -6,232 +6,232 @@
 // - Show declarations: true
 
 // Library unique name: <KMPermission:kmppermission-core>
-final enum class com.kmp.permission/PermissionGroup : kotlin/Enum<com.kmp.permission/PermissionGroup> { // com.kmp.permission/PermissionGroup|null[0]
-    enum entry Bluetooth // com.kmp.permission/PermissionGroup.Bluetooth|null[0]
-    enum entry Calendar // com.kmp.permission/PermissionGroup.Calendar|null[0]
-    enum entry Camera // com.kmp.permission/PermissionGroup.Camera|null[0]
-    enum entry Contacts // com.kmp.permission/PermissionGroup.Contacts|null[0]
-    enum entry Location // com.kmp.permission/PermissionGroup.Location|null[0]
-    enum entry Microphone // com.kmp.permission/PermissionGroup.Microphone|null[0]
-    enum entry Motion // com.kmp.permission/PermissionGroup.Motion|null[0]
-    enum entry Network // com.kmp.permission/PermissionGroup.Network|null[0]
-    enum entry Nfc // com.kmp.permission/PermissionGroup.Nfc|null[0]
-    enum entry Notifications // com.kmp.permission/PermissionGroup.Notifications|null[0]
-    enum entry Photos // com.kmp.permission/PermissionGroup.Photos|null[0]
-    enum entry SpeechRecognition // com.kmp.permission/PermissionGroup.SpeechRecognition|null[0]
-    enum entry Storage // com.kmp.permission/PermissionGroup.Storage|null[0]
+final enum class io.github.ahmadhussain0335.kmppermission/PermissionGroup : kotlin/Enum<io.github.ahmadhussain0335.kmppermission/PermissionGroup> { // io.github.ahmadhussain0335.kmppermission/PermissionGroup|null[0]
+    enum entry Bluetooth // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Bluetooth|null[0]
+    enum entry Calendar // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Calendar|null[0]
+    enum entry Camera // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Camera|null[0]
+    enum entry Contacts // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Contacts|null[0]
+    enum entry Location // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Location|null[0]
+    enum entry Microphone // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Microphone|null[0]
+    enum entry Motion // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Motion|null[0]
+    enum entry Network // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Network|null[0]
+    enum entry Nfc // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Nfc|null[0]
+    enum entry Notifications // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Notifications|null[0]
+    enum entry Photos // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Photos|null[0]
+    enum entry SpeechRecognition // io.github.ahmadhussain0335.kmppermission/PermissionGroup.SpeechRecognition|null[0]
+    enum entry Storage // io.github.ahmadhussain0335.kmppermission/PermissionGroup.Storage|null[0]
 
-    final val entries // com.kmp.permission/PermissionGroup.entries|#static{}entries[0]
-        final fun <get-entries>(): kotlin.enums/EnumEntries<com.kmp.permission/PermissionGroup> // com.kmp.permission/PermissionGroup.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val entries // io.github.ahmadhussain0335.kmppermission/PermissionGroup.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.ahmadhussain0335.kmppermission/PermissionGroup> // io.github.ahmadhussain0335.kmppermission/PermissionGroup.entries.<get-entries>|<get-entries>#static(){}[0]
 
-    final fun valueOf(kotlin/String): com.kmp.permission/PermissionGroup // com.kmp.permission/PermissionGroup.valueOf|valueOf#static(kotlin.String){}[0]
-    final fun values(): kotlin/Array<com.kmp.permission/PermissionGroup> // com.kmp.permission/PermissionGroup.values|values#static(){}[0]
+    final fun valueOf(kotlin/String): io.github.ahmadhussain0335.kmppermission/PermissionGroup // io.github.ahmadhussain0335.kmppermission/PermissionGroup.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.ahmadhussain0335.kmppermission/PermissionGroup> // io.github.ahmadhussain0335.kmppermission/PermissionGroup.values|values#static(){}[0]
 }
 
-abstract interface com.kmp.permission/PermissionManager : com.kmp.permission/PermissionObserver { // com.kmp.permission/PermissionManager|null[0]
-    abstract fun areGranted(kotlin/Array<out com.kmp.permission/Permission>...): kotlin/Boolean // com.kmp.permission/PermissionManager.areGranted|areGranted(kotlin.Array<out|com.kmp.permission.Permission>...){}[0]
-    abstract fun check(com.kmp.permission/Permission): com.kmp.permission/PermissionStatus // com.kmp.permission/PermissionManager.check|check(com.kmp.permission.Permission){}[0]
-    abstract fun openSettings() // com.kmp.permission/PermissionManager.openSettings|openSettings(){}[0]
-    abstract fun request(com.kmp.permission/Permission, kotlin/Function1<com.kmp.permission/PermissionStatus, kotlin/Unit>) // com.kmp.permission/PermissionManager.request|request(com.kmp.permission.Permission;kotlin.Function1<com.kmp.permission.PermissionStatus,kotlin.Unit>){}[0]
-    abstract fun request(kotlin.collections/List<com.kmp.permission/Permission>, kotlin/Function1<kotlin.collections/Map<com.kmp.permission/Permission, com.kmp.permission/PermissionStatus>, kotlin/Unit>) // com.kmp.permission/PermissionManager.request|request(kotlin.collections.List<com.kmp.permission.Permission>;kotlin.Function1<kotlin.collections.Map<com.kmp.permission.Permission,com.kmp.permission.PermissionStatus>,kotlin.Unit>){}[0]
-    abstract suspend fun request(com.kmp.permission/Permission): com.kmp.permission/PermissionStatus // com.kmp.permission/PermissionManager.request|request(com.kmp.permission.Permission){}[0]
-    abstract suspend fun request(kotlin/Array<out com.kmp.permission/Permission>...): kotlin.collections/Map<com.kmp.permission/Permission, com.kmp.permission/PermissionStatus> // com.kmp.permission/PermissionManager.request|request(kotlin.Array<out|com.kmp.permission.Permission>...){}[0]
+abstract interface io.github.ahmadhussain0335.kmppermission/PermissionManager : io.github.ahmadhussain0335.kmppermission/PermissionObserver { // io.github.ahmadhussain0335.kmppermission/PermissionManager|null[0]
+    abstract fun areGranted(kotlin/Array<out io.github.ahmadhussain0335.kmppermission/Permission>...): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/PermissionManager.areGranted|areGranted(kotlin.Array<out|io.github.ahmadhussain0335.kmppermission.Permission>...){}[0]
+    abstract fun check(io.github.ahmadhussain0335.kmppermission/Permission): io.github.ahmadhussain0335.kmppermission/PermissionStatus // io.github.ahmadhussain0335.kmppermission/PermissionManager.check|check(io.github.ahmadhussain0335.kmppermission.Permission){}[0]
+    abstract fun openSettings() // io.github.ahmadhussain0335.kmppermission/PermissionManager.openSettings|openSettings(){}[0]
+    abstract fun request(io.github.ahmadhussain0335.kmppermission/Permission, kotlin/Function1<io.github.ahmadhussain0335.kmppermission/PermissionStatus, kotlin/Unit>) // io.github.ahmadhussain0335.kmppermission/PermissionManager.request|request(io.github.ahmadhussain0335.kmppermission.Permission;kotlin.Function1<io.github.ahmadhussain0335.kmppermission.PermissionStatus,kotlin.Unit>){}[0]
+    abstract fun request(kotlin.collections/List<io.github.ahmadhussain0335.kmppermission/Permission>, kotlin/Function1<kotlin.collections/Map<io.github.ahmadhussain0335.kmppermission/Permission, io.github.ahmadhussain0335.kmppermission/PermissionStatus>, kotlin/Unit>) // io.github.ahmadhussain0335.kmppermission/PermissionManager.request|request(kotlin.collections.List<io.github.ahmadhussain0335.kmppermission.Permission>;kotlin.Function1<kotlin.collections.Map<io.github.ahmadhussain0335.kmppermission.Permission,io.github.ahmadhussain0335.kmppermission.PermissionStatus>,kotlin.Unit>){}[0]
+    abstract suspend fun request(io.github.ahmadhussain0335.kmppermission/Permission): io.github.ahmadhussain0335.kmppermission/PermissionStatus // io.github.ahmadhussain0335.kmppermission/PermissionManager.request|request(io.github.ahmadhussain0335.kmppermission.Permission){}[0]
+    abstract suspend fun request(kotlin/Array<out io.github.ahmadhussain0335.kmppermission/Permission>...): kotlin.collections/Map<io.github.ahmadhussain0335.kmppermission/Permission, io.github.ahmadhussain0335.kmppermission/PermissionStatus> // io.github.ahmadhussain0335.kmppermission/PermissionManager.request|request(kotlin.Array<out|io.github.ahmadhussain0335.kmppermission.Permission>...){}[0]
 }
 
-abstract interface com.kmp.permission/PermissionObserver { // com.kmp.permission/PermissionObserver|null[0]
-    abstract fun observe(com.kmp.permission/Permission): kotlinx.coroutines.flow/Flow<com.kmp.permission/PermissionStatus> // com.kmp.permission/PermissionObserver.observe|observe(com.kmp.permission.Permission){}[0]
-    abstract fun observe(kotlin/Array<out com.kmp.permission/Permission>...): kotlinx.coroutines.flow/Flow<kotlin.collections/Map<com.kmp.permission/Permission, com.kmp.permission/PermissionStatus>> // com.kmp.permission/PermissionObserver.observe|observe(kotlin.Array<out|com.kmp.permission.Permission>...){}[0]
+abstract interface io.github.ahmadhussain0335.kmppermission/PermissionObserver { // io.github.ahmadhussain0335.kmppermission/PermissionObserver|null[0]
+    abstract fun observe(io.github.ahmadhussain0335.kmppermission/Permission): kotlinx.coroutines.flow/Flow<io.github.ahmadhussain0335.kmppermission/PermissionStatus> // io.github.ahmadhussain0335.kmppermission/PermissionObserver.observe|observe(io.github.ahmadhussain0335.kmppermission.Permission){}[0]
+    abstract fun observe(kotlin/Array<out io.github.ahmadhussain0335.kmppermission/Permission>...): kotlinx.coroutines.flow/Flow<kotlin.collections/Map<io.github.ahmadhussain0335.kmppermission/Permission, io.github.ahmadhussain0335.kmppermission/PermissionStatus>> // io.github.ahmadhussain0335.kmppermission/PermissionObserver.observe|observe(kotlin.Array<out|io.github.ahmadhussain0335.kmppermission.Permission>...){}[0]
 }
 
-sealed interface com.kmp.permission/PermissionStatus { // com.kmp.permission/PermissionStatus|null[0]
-    final object Denied : com.kmp.permission/PermissionStatus { // com.kmp.permission/PermissionStatus.Denied|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/PermissionStatus.Denied.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/PermissionStatus.Denied.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/PermissionStatus.Denied.toString|toString(){}[0]
+sealed interface io.github.ahmadhussain0335.kmppermission/PermissionStatus { // io.github.ahmadhussain0335.kmppermission/PermissionStatus|null[0]
+    final object Denied : io.github.ahmadhussain0335.kmppermission/PermissionStatus { // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Denied|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Denied.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Denied.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Denied.toString|toString(){}[0]
     }
 
-    final object Granted : com.kmp.permission/PermissionStatus { // com.kmp.permission/PermissionStatus.Granted|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/PermissionStatus.Granted.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/PermissionStatus.Granted.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/PermissionStatus.Granted.toString|toString(){}[0]
+    final object Granted : io.github.ahmadhussain0335.kmppermission/PermissionStatus { // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Granted|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Granted.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Granted.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Granted.toString|toString(){}[0]
     }
 
-    final object Limited : com.kmp.permission/PermissionStatus { // com.kmp.permission/PermissionStatus.Limited|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/PermissionStatus.Limited.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/PermissionStatus.Limited.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/PermissionStatus.Limited.toString|toString(){}[0]
+    final object Limited : io.github.ahmadhussain0335.kmppermission/PermissionStatus { // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Limited|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Limited.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Limited.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Limited.toString|toString(){}[0]
     }
 
-    final object NotDetermined : com.kmp.permission/PermissionStatus { // com.kmp.permission/PermissionStatus.NotDetermined|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/PermissionStatus.NotDetermined.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/PermissionStatus.NotDetermined.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/PermissionStatus.NotDetermined.toString|toString(){}[0]
+    final object NotDetermined : io.github.ahmadhussain0335.kmppermission/PermissionStatus { // io.github.ahmadhussain0335.kmppermission/PermissionStatus.NotDetermined|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/PermissionStatus.NotDetermined.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/PermissionStatus.NotDetermined.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/PermissionStatus.NotDetermined.toString|toString(){}[0]
     }
 
-    final object PermanentlyDenied : com.kmp.permission/PermissionStatus { // com.kmp.permission/PermissionStatus.PermanentlyDenied|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/PermissionStatus.PermanentlyDenied.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/PermissionStatus.PermanentlyDenied.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/PermissionStatus.PermanentlyDenied.toString|toString(){}[0]
+    final object PermanentlyDenied : io.github.ahmadhussain0335.kmppermission/PermissionStatus { // io.github.ahmadhussain0335.kmppermission/PermissionStatus.PermanentlyDenied|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/PermissionStatus.PermanentlyDenied.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/PermissionStatus.PermanentlyDenied.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/PermissionStatus.PermanentlyDenied.toString|toString(){}[0]
     }
 
-    final object Restricted : com.kmp.permission/PermissionStatus { // com.kmp.permission/PermissionStatus.Restricted|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/PermissionStatus.Restricted.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/PermissionStatus.Restricted.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/PermissionStatus.Restricted.toString|toString(){}[0]
-    }
-}
-
-sealed class com.kmp.permission/Permission { // com.kmp.permission/Permission|null[0]
-    final val group // com.kmp.permission/Permission.group|{}group[0]
-        final fun <get-group>(): com.kmp.permission/PermissionGroup // com.kmp.permission/Permission.group.<get-group>|<get-group>(){}[0]
-
-    final object Bluetooth : com.kmp.permission/Permission { // com.kmp.permission/Permission.Bluetooth|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Bluetooth.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Bluetooth.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Bluetooth.toString|toString(){}[0]
-    }
-
-    final object BluetoothAdvertise : com.kmp.permission/Permission { // com.kmp.permission/Permission.BluetoothAdvertise|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.BluetoothAdvertise.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.BluetoothAdvertise.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.BluetoothAdvertise.toString|toString(){}[0]
-    }
-
-    final object BluetoothConnect : com.kmp.permission/Permission { // com.kmp.permission/Permission.BluetoothConnect|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.BluetoothConnect.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.BluetoothConnect.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.BluetoothConnect.toString|toString(){}[0]
-    }
-
-    final object BluetoothScan : com.kmp.permission/Permission { // com.kmp.permission/Permission.BluetoothScan|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.BluetoothScan.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.BluetoothScan.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.BluetoothScan.toString|toString(){}[0]
-    }
-
-    final object Calendar : com.kmp.permission/Permission { // com.kmp.permission/Permission.Calendar|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Calendar.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Calendar.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Calendar.toString|toString(){}[0]
-    }
-
-    final object Camera : com.kmp.permission/Permission { // com.kmp.permission/Permission.Camera|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Camera.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Camera.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Camera.toString|toString(){}[0]
-    }
-
-    final object Contacts : com.kmp.permission/Permission { // com.kmp.permission/Permission.Contacts|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Contacts.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Contacts.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Contacts.toString|toString(){}[0]
-    }
-
-    final object LocalNetwork : com.kmp.permission/Permission { // com.kmp.permission/Permission.LocalNetwork|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.LocalNetwork.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.LocalNetwork.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.LocalNetwork.toString|toString(){}[0]
-    }
-
-    final object LocationBackground : com.kmp.permission/Permission { // com.kmp.permission/Permission.LocationBackground|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.LocationBackground.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.LocationBackground.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.LocationBackground.toString|toString(){}[0]
-    }
-
-    final object LocationCoarse : com.kmp.permission/Permission { // com.kmp.permission/Permission.LocationCoarse|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.LocationCoarse.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.LocationCoarse.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.LocationCoarse.toString|toString(){}[0]
-    }
-
-    final object LocationFine : com.kmp.permission/Permission { // com.kmp.permission/Permission.LocationFine|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.LocationFine.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.LocationFine.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.LocationFine.toString|toString(){}[0]
-    }
-
-    final object Microphone : com.kmp.permission/Permission { // com.kmp.permission/Permission.Microphone|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Microphone.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Microphone.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Microphone.toString|toString(){}[0]
-    }
-
-    final object Motion : com.kmp.permission/Permission { // com.kmp.permission/Permission.Motion|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Motion.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Motion.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Motion.toString|toString(){}[0]
-    }
-
-    final object NearbyWifiDevices : com.kmp.permission/Permission { // com.kmp.permission/Permission.NearbyWifiDevices|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.NearbyWifiDevices.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.NearbyWifiDevices.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.NearbyWifiDevices.toString|toString(){}[0]
-    }
-
-    final object Nfc : com.kmp.permission/Permission { // com.kmp.permission/Permission.Nfc|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Nfc.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Nfc.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Nfc.toString|toString(){}[0]
-    }
-
-    final object Notifications : com.kmp.permission/Permission { // com.kmp.permission/Permission.Notifications|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Notifications.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Notifications.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Notifications.toString|toString(){}[0]
-    }
-
-    final object Photos : com.kmp.permission/Permission { // com.kmp.permission/Permission.Photos|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Photos.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Photos.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Photos.toString|toString(){}[0]
-    }
-
-    final object SpeechRecognition : com.kmp.permission/Permission { // com.kmp.permission/Permission.SpeechRecognition|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.SpeechRecognition.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.SpeechRecognition.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.SpeechRecognition.toString|toString(){}[0]
-    }
-
-    final object Storage : com.kmp.permission/Permission { // com.kmp.permission/Permission.Storage|null[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // com.kmp.permission/Permission.Storage.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // com.kmp.permission/Permission.Storage.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // com.kmp.permission/Permission.Storage.toString|toString(){}[0]
+    final object Restricted : io.github.ahmadhussain0335.kmppermission/PermissionStatus { // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Restricted|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Restricted.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Restricted.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/PermissionStatus.Restricted.toString|toString(){}[0]
     }
 }
 
-sealed class com.kmp.permission/PermissionException : kotlin/Exception { // com.kmp.permission/PermissionException|null[0]
-    final class InfoPlistUsageDescriptionMissing : com.kmp.permission/PermissionException { // com.kmp.permission/PermissionException.InfoPlistUsageDescriptionMissing|null[0]
-        constructor <init>(com.kmp.permission/Permission, kotlin/String) // com.kmp.permission/PermissionException.InfoPlistUsageDescriptionMissing.<init>|<init>(com.kmp.permission.Permission;kotlin.String){}[0]
+sealed class io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission|null[0]
+    final val group // io.github.ahmadhussain0335.kmppermission/Permission.group|{}group[0]
+        final fun <get-group>(): io.github.ahmadhussain0335.kmppermission/PermissionGroup // io.github.ahmadhussain0335.kmppermission/Permission.group.<get-group>|<get-group>(){}[0]
 
-        final val infoPlistKey // com.kmp.permission/PermissionException.InfoPlistUsageDescriptionMissing.infoPlistKey|{}infoPlistKey[0]
-            final fun <get-infoPlistKey>(): kotlin/String // com.kmp.permission/PermissionException.InfoPlistUsageDescriptionMissing.infoPlistKey.<get-infoPlistKey>|<get-infoPlistKey>(){}[0]
-        final val permission // com.kmp.permission/PermissionException.InfoPlistUsageDescriptionMissing.permission|{}permission[0]
-            final fun <get-permission>(): com.kmp.permission/Permission // com.kmp.permission/PermissionException.InfoPlistUsageDescriptionMissing.permission.<get-permission>|<get-permission>(){}[0]
+    final object Bluetooth : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Bluetooth|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Bluetooth.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Bluetooth.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Bluetooth.toString|toString(){}[0]
     }
 
-    final class ManagerNotAttached : com.kmp.permission/PermissionException { // com.kmp.permission/PermissionException.ManagerNotAttached|null[0]
-        constructor <init>(kotlin/String = ...) // com.kmp.permission/PermissionException.ManagerNotAttached.<init>|<init>(kotlin.String){}[0]
+    final object BluetoothAdvertise : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothAdvertise|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothAdvertise.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothAdvertise.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothAdvertise.toString|toString(){}[0]
     }
 
-    final class ManifestPermissionMissing : com.kmp.permission/PermissionException { // com.kmp.permission/PermissionException.ManifestPermissionMissing|null[0]
-        constructor <init>(com.kmp.permission/Permission, kotlin.collections/List<kotlin/String>) // com.kmp.permission/PermissionException.ManifestPermissionMissing.<init>|<init>(com.kmp.permission.Permission;kotlin.collections.List<kotlin.String>){}[0]
-
-        final val manifestEntries // com.kmp.permission/PermissionException.ManifestPermissionMissing.manifestEntries|{}manifestEntries[0]
-            final fun <get-manifestEntries>(): kotlin.collections/List<kotlin/String> // com.kmp.permission/PermissionException.ManifestPermissionMissing.manifestEntries.<get-manifestEntries>|<get-manifestEntries>(){}[0]
-        final val permission // com.kmp.permission/PermissionException.ManifestPermissionMissing.permission|{}permission[0]
-            final fun <get-permission>(): com.kmp.permission/Permission // com.kmp.permission/PermissionException.ManifestPermissionMissing.permission.<get-permission>|<get-permission>(){}[0]
+    final object BluetoothConnect : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothConnect|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothConnect.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothConnect.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothConnect.toString|toString(){}[0]
     }
 
-    final class UnsupportedPermission : com.kmp.permission/PermissionException { // com.kmp.permission/PermissionException.UnsupportedPermission|null[0]
-        constructor <init>(com.kmp.permission/Permission, kotlin/String) // com.kmp.permission/PermissionException.UnsupportedPermission.<init>|<init>(com.kmp.permission.Permission;kotlin.String){}[0]
+    final object BluetoothScan : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothScan|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothScan.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothScan.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.BluetoothScan.toString|toString(){}[0]
+    }
 
-        final val permission // com.kmp.permission/PermissionException.UnsupportedPermission.permission|{}permission[0]
-            final fun <get-permission>(): com.kmp.permission/Permission // com.kmp.permission/PermissionException.UnsupportedPermission.permission.<get-permission>|<get-permission>(){}[0]
-        final val platform // com.kmp.permission/PermissionException.UnsupportedPermission.platform|{}platform[0]
-            final fun <get-platform>(): kotlin/String // com.kmp.permission/PermissionException.UnsupportedPermission.platform.<get-platform>|<get-platform>(){}[0]
+    final object Calendar : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Calendar|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Calendar.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Calendar.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Calendar.toString|toString(){}[0]
+    }
+
+    final object Camera : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Camera|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Camera.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Camera.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Camera.toString|toString(){}[0]
+    }
+
+    final object Contacts : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Contacts|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Contacts.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Contacts.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Contacts.toString|toString(){}[0]
+    }
+
+    final object LocalNetwork : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.LocalNetwork|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.LocalNetwork.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.LocalNetwork.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.LocalNetwork.toString|toString(){}[0]
+    }
+
+    final object LocationBackground : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.LocationBackground|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.LocationBackground.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.LocationBackground.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.LocationBackground.toString|toString(){}[0]
+    }
+
+    final object LocationCoarse : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.LocationCoarse|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.LocationCoarse.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.LocationCoarse.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.LocationCoarse.toString|toString(){}[0]
+    }
+
+    final object LocationFine : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.LocationFine|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.LocationFine.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.LocationFine.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.LocationFine.toString|toString(){}[0]
+    }
+
+    final object Microphone : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Microphone|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Microphone.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Microphone.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Microphone.toString|toString(){}[0]
+    }
+
+    final object Motion : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Motion|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Motion.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Motion.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Motion.toString|toString(){}[0]
+    }
+
+    final object NearbyWifiDevices : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.NearbyWifiDevices|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.NearbyWifiDevices.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.NearbyWifiDevices.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.NearbyWifiDevices.toString|toString(){}[0]
+    }
+
+    final object Nfc : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Nfc|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Nfc.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Nfc.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Nfc.toString|toString(){}[0]
+    }
+
+    final object Notifications : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Notifications|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Notifications.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Notifications.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Notifications.toString|toString(){}[0]
+    }
+
+    final object Photos : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Photos|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Photos.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Photos.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Photos.toString|toString(){}[0]
+    }
+
+    final object SpeechRecognition : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.SpeechRecognition|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.SpeechRecognition.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.SpeechRecognition.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.SpeechRecognition.toString|toString(){}[0]
+    }
+
+    final object Storage : io.github.ahmadhussain0335.kmppermission/Permission { // io.github.ahmadhussain0335.kmppermission/Permission.Storage|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.ahmadhussain0335.kmppermission/Permission.Storage.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.ahmadhussain0335.kmppermission/Permission.Storage.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.ahmadhussain0335.kmppermission/Permission.Storage.toString|toString(){}[0]
     }
 }
 
-final fun com.kmp.permission/PermissionManager(): com.kmp.permission/PermissionManager // com.kmp.permission/PermissionManager|PermissionManager(){}[0]
-final fun com.kmp.permission/PermissionManager(kotlinx.coroutines/CoroutineScope = ...): com.kmp.permission/PermissionManager // com.kmp.permission/PermissionManager|PermissionManager(kotlinx.coroutines.CoroutineScope){}[0]
+sealed class io.github.ahmadhussain0335.kmppermission/PermissionException : kotlin/Exception { // io.github.ahmadhussain0335.kmppermission/PermissionException|null[0]
+    final class InfoPlistUsageDescriptionMissing : io.github.ahmadhussain0335.kmppermission/PermissionException { // io.github.ahmadhussain0335.kmppermission/PermissionException.InfoPlistUsageDescriptionMissing|null[0]
+        constructor <init>(io.github.ahmadhussain0335.kmppermission/Permission, kotlin/String) // io.github.ahmadhussain0335.kmppermission/PermissionException.InfoPlistUsageDescriptionMissing.<init>|<init>(io.github.ahmadhussain0335.kmppermission.Permission;kotlin.String){}[0]
+
+        final val infoPlistKey // io.github.ahmadhussain0335.kmppermission/PermissionException.InfoPlistUsageDescriptionMissing.infoPlistKey|{}infoPlistKey[0]
+            final fun <get-infoPlistKey>(): kotlin/String // io.github.ahmadhussain0335.kmppermission/PermissionException.InfoPlistUsageDescriptionMissing.infoPlistKey.<get-infoPlistKey>|<get-infoPlistKey>(){}[0]
+        final val permission // io.github.ahmadhussain0335.kmppermission/PermissionException.InfoPlistUsageDescriptionMissing.permission|{}permission[0]
+            final fun <get-permission>(): io.github.ahmadhussain0335.kmppermission/Permission // io.github.ahmadhussain0335.kmppermission/PermissionException.InfoPlistUsageDescriptionMissing.permission.<get-permission>|<get-permission>(){}[0]
+    }
+
+    final class ManagerNotAttached : io.github.ahmadhussain0335.kmppermission/PermissionException { // io.github.ahmadhussain0335.kmppermission/PermissionException.ManagerNotAttached|null[0]
+        constructor <init>(kotlin/String = ...) // io.github.ahmadhussain0335.kmppermission/PermissionException.ManagerNotAttached.<init>|<init>(kotlin.String){}[0]
+    }
+
+    final class ManifestPermissionMissing : io.github.ahmadhussain0335.kmppermission/PermissionException { // io.github.ahmadhussain0335.kmppermission/PermissionException.ManifestPermissionMissing|null[0]
+        constructor <init>(io.github.ahmadhussain0335.kmppermission/Permission, kotlin.collections/List<kotlin/String>) // io.github.ahmadhussain0335.kmppermission/PermissionException.ManifestPermissionMissing.<init>|<init>(io.github.ahmadhussain0335.kmppermission.Permission;kotlin.collections.List<kotlin.String>){}[0]
+
+        final val manifestEntries // io.github.ahmadhussain0335.kmppermission/PermissionException.ManifestPermissionMissing.manifestEntries|{}manifestEntries[0]
+            final fun <get-manifestEntries>(): kotlin.collections/List<kotlin/String> // io.github.ahmadhussain0335.kmppermission/PermissionException.ManifestPermissionMissing.manifestEntries.<get-manifestEntries>|<get-manifestEntries>(){}[0]
+        final val permission // io.github.ahmadhussain0335.kmppermission/PermissionException.ManifestPermissionMissing.permission|{}permission[0]
+            final fun <get-permission>(): io.github.ahmadhussain0335.kmppermission/Permission // io.github.ahmadhussain0335.kmppermission/PermissionException.ManifestPermissionMissing.permission.<get-permission>|<get-permission>(){}[0]
+    }
+
+    final class UnsupportedPermission : io.github.ahmadhussain0335.kmppermission/PermissionException { // io.github.ahmadhussain0335.kmppermission/PermissionException.UnsupportedPermission|null[0]
+        constructor <init>(io.github.ahmadhussain0335.kmppermission/Permission, kotlin/String) // io.github.ahmadhussain0335.kmppermission/PermissionException.UnsupportedPermission.<init>|<init>(io.github.ahmadhussain0335.kmppermission.Permission;kotlin.String){}[0]
+
+        final val permission // io.github.ahmadhussain0335.kmppermission/PermissionException.UnsupportedPermission.permission|{}permission[0]
+            final fun <get-permission>(): io.github.ahmadhussain0335.kmppermission/Permission // io.github.ahmadhussain0335.kmppermission/PermissionException.UnsupportedPermission.permission.<get-permission>|<get-permission>(){}[0]
+        final val platform // io.github.ahmadhussain0335.kmppermission/PermissionException.UnsupportedPermission.platform|{}platform[0]
+            final fun <get-platform>(): kotlin/String // io.github.ahmadhussain0335.kmppermission/PermissionException.UnsupportedPermission.platform.<get-platform>|<get-platform>(){}[0]
+    }
+}
+
+final fun io.github.ahmadhussain0335.kmppermission/PermissionManager(): io.github.ahmadhussain0335.kmppermission/PermissionManager // io.github.ahmadhussain0335.kmppermission/PermissionManager|PermissionManager(){}[0]
+final fun io.github.ahmadhussain0335.kmppermission/PermissionManager(kotlinx.coroutines/CoroutineScope = ...): io.github.ahmadhussain0335.kmppermission/PermissionManager // io.github.ahmadhussain0335.kmppermission/PermissionManager|PermissionManager(kotlinx.coroutines.CoroutineScope){}[0]

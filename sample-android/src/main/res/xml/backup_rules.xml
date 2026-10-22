@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android 11 and below. See data_extraction_rules.xml. -->
+<!-- Android 11 and below. See data_extraction_rules.xml. The file keeps its pre-0.3.0 package name
+     on purpose (see RequestedPermissionsStore.PREFS_NAME). -->
 <full-backup-content>
     <exclude domain="sharedpref" path="com.kmp.permission.requested_permissions.xml" />
 </full-backup-content>

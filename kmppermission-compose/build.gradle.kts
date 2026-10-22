@@ -28,7 +28,7 @@ kotlin {
     }
 
     android {
-        namespace = "com.kmp.permission.compose"
+        namespace = "io.github.ahmadhussain0335.kmppermission.compose"
         minSdk = 26
         compileSdk = libs.versions.android.compileSdk.get().toInt()
 

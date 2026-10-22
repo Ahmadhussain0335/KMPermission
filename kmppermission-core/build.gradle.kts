@@ -36,7 +36,7 @@ kotlin {
     }
 
     android {
-        namespace = "com.kmp.permission"
+        namespace = "io.github.ahmadhussain0335.kmppermission"
         // The library targets Android 8.0+ regardless of what consuming apps declare.
         minSdk = 26
         compileSdk = libs.versions.android.compileSdk.get().toInt()

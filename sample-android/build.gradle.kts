@@ -24,11 +24,11 @@ dependencies {
 }
 
 android {
-    namespace = "com.kmp.permission.sample.android"
+    namespace = "io.github.ahmadhussain0335.kmppermission.sample"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.kmp.permission.sample.android"
+        applicationId = "io.github.ahmadhussain0335.kmppermission.sample"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

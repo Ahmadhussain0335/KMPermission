@@ -20,7 +20,7 @@ A Kotlin Multiplatform library for checking, requesting and observing runtime pe
 | `sample-android` | Compose sample app. |
 | `sample-ios` | SwiftUI sample app using `KMPPermissionCore` (open `sample-ios/iosApp.xcodeproj`). |
 
-The library supports Android 8.0 (API 26) and later and iOS 15 and later.
+The library supports Android 8.0 (API 26) and later and iOS 15 and later. Kotlin code lives in the package `io.github.ahmadhussain0335.kmppermission`; upgrading from 0.2.x changes the imports (see [CHANGELOG.md](CHANGELOG.md#migrating-from-02x)).
 
 ## Installation
 
@@ -112,6 +112,10 @@ Below API 31, BLE scans return no results without location permission, so `Bluet
 ### Android
 
 ```kotlin
+import io.github.ahmadhussain0335.kmppermission.Permission
+import io.github.ahmadhussain0335.kmppermission.PermissionManager
+import io.github.ahmadhussain0335.kmppermission.PermissionStatus
+
 class MainActivity : ComponentActivity() {
     private val permissions by lazy { PermissionManager(this) }
 
@@ -127,6 +131,8 @@ Create the manager per Activity instance. A request still waiting when its Activ
 ### iOS (Swift)
 
 ```swift
+import KMPPermissionCore
+
 let manager = PermissionManager_iosKt.PermissionManager()
 
 manager.request(permissions: [Permission.Camera.shared, Permission.Microphone.shared]) { results in
@@ -139,6 +145,10 @@ Requests run on the main thread one at a time, so issuing several in a row is sa
 ### Compose
 
 ```kotlin
+import io.github.ahmadhussain0335.kmppermission.Permission
+import io.github.ahmadhussain0335.kmppermission.PermissionStatus
+import io.github.ahmadhussain0335.kmppermission.compose.rememberPermissionState
+
 @Composable
 fun CameraScreen() {
     val camera = rememberPermissionState(Permission.Camera)
@@ -158,7 +168,7 @@ fun CameraScreen() {
 - `LocalNetwork` is only enforced on Android 17+ for apps targeting SDK 37+. When it is, a grant of another Nearby devices permission (Bluetooth Scan/Connect/Advertise, Nearby Wi-Fi) may cover it without a new prompt. On Android 16 the restriction is an opt-in developer compat flag (`RESTRICT_LOCAL_NETWORK`) and is not reflected by the library.
 - `Storage` reports `Granted` on API 33+, where no storage permission exists. Use `Photos` or the system pickers for media.
 - `Notifications` below API 33 reflects whether notifications are enabled in Settings.
-- `Denied` versus `PermanentlyDenied` relies on a small history the library keeps in SharedPreferences (`com.kmp.permission.requested_permissions`). Exclude it from backup; see `sample-android/src/main/res/xml/`. Otherwise a restored install reports never-requested permissions as permanently denied.
+- `Denied` versus `PermanentlyDenied` relies on a small history the library keeps in SharedPreferences (`com.kmp.permission.requested_permissions`; the file keeps this pre-0.3.0 name so existing history survives the package rename). Exclude it from backup; see `sample-android/src/main/res/xml/`. Otherwise a restored install reports never-requested permissions as permanently denied.
 - A system auto-deny is recognised because the result arrives within 500 ms, faster than a person can answer a dialog. A dismissed dialog stays `Denied`.
 
 ### iOS

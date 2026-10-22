@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android 12+. KMPermission's request history describes this install only; restored on a new
-     device it would report never-requested permissions as permanently denied. -->
+     device it would report never-requested permissions as permanently denied. The file keeps its
+     pre-0.3.0 package name on purpose (see RequestedPermissionsStore.PREFS_NAME). -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="sharedpref" path="com.kmp.permission.requested_permissions.xml" />

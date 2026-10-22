@@ -1,0 +1,156 @@
+package io.github.ahmadhussain0335.kmppermission.internal
+
+import android.os.Build
+import io.github.ahmadhussain0335.kmppermission.Permission
+
+private const val ACCESS_FINE_LOCATION = "android.permission.ACCESS_FINE_LOCATION"
+private const val ACCESS_COARSE_LOCATION = "android.permission.ACCESS_COARSE_LOCATION"
+private const val READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE"
+private const val READ_MEDIA_VISUAL_USER_SELECTED = "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+
+/** Android 17, where local network access becomes a runtime permission for apps targeting it. */
+private const val API_37 = 37
+
+/**
+ * Layers Android SDK-version gating on top of the platform-agnostic [PermissionMapper].
+ *
+ * Several permissions changed shape across API levels: some only became runtime permissions at a
+ * specific level (Bluetooth Scan/Connect, Notifications), some are covered by a different permission
+ * below or above a level (Photos, Storage, background location), and some can be granted partially
+ * (approximate location, selected photos).
+ */
+internal object AndroidPermissionMapper {
+
+    /**
+     * The host app's `targetSdkVersion`, which decides whether [Permission.LocalNetwork] is enforced.
+     * Set by [PermissionController.attach]; every check happens after that.
+     */
+    @Volatile
+    var appTargetSdk: Int = 0
+
+    /**
+     * Manifest permission string(s) that must all be declared and granted for [permission] to be
+     * [io.github.ahmadhussain0335.kmppermission.PermissionStatus.Granted] on [sdkInt]. Empty if none apply there.
+     */
+    fun manifestPermissions(
+        permission: Permission,
+        sdkInt: Int = Build.VERSION.SDK_INT,
+        targetSdkInt: Int = appTargetSdk,
+    ): List<String> =
+        when (permission) {
+            Permission.Photos ->
+                if (sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+                    PermissionMapper.androidManifestPermissions(permission)
+                } else {
+                    listOf(READ_EXTERNAL_STORAGE)
+                }
+
+            // From API 31 the legacy BLUETOOTH/BLUETOOTH_ADMIN permissions are ignored and usually
+            // declared with maxSdkVersion="30"; general Bluetooth use needs Scan and Connect instead.
+            // Below that, the legacy pair is install-time and scanning also needs location.
+            Permission.Bluetooth ->
+                if (sdkInt >= Build.VERSION_CODES.S) {
+                    PermissionMapper.androidManifestPermissions(Permission.BluetoothScan) +
+                        PermissionMapper.androidManifestPermissions(Permission.BluetoothConnect)
+                } else {
+                    PermissionMapper.androidManifestPermissions(permission) + bleScanLocationPermission(sdkInt)
+                }
+
+            // Below API 31 BLE scans return no results without location permission.
+            Permission.BluetoothScan ->
+                if (sdkInt >= Build.VERSION_CODES.S) {
+                    PermissionMapper.androidManifestPermissions(permission)
+                } else {
+                    listOf(bleScanLocationPermission(sdkInt))
+                }
+
+            Permission.BluetoothConnect, Permission.BluetoothAdvertise ->
+                if (sdkInt >= Build.VERSION_CODES.S) PermissionMapper.androidManifestPermissions(permission) else emptyList()
+
+            // Below API 33 the Wi-Fi discovery APIs are guarded by fine location instead.
+            Permission.NearbyWifiDevices ->
+                if (sdkInt >= Build.VERSION_CODES.TIRAMISU) PermissionMapper.androidManifestPermissions(permission) else listOf(ACCESS_FINE_LOCATION)
+
+            // Must not be declared or requested before the app targets SDK 37.
+            Permission.LocalNetwork ->
+                if (isLocalNetworkEnforced(sdkInt, targetSdkInt)) PermissionMapper.androidManifestPermissions(permission) else emptyList()
+
+            // Below API 33 notifications have no runtime permission; see PermissionStatusResolver.
+            Permission.Notifications ->
+                if (sdkInt >= Build.VERSION_CODES.TIRAMISU) PermissionMapper.androidManifestPermissions(permission) else emptyList()
+
+            // From API 31 the system ignores a request for fine location that doesn't also ask for
+            // coarse, and the user may grant only the coarse one.
+            Permission.LocationFine ->
+                if (sdkInt >= Build.VERSION_CODES.S) listOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION) else listOf(ACCESS_FINE_LOCATION)
+
+            // Below API 29 any foreground location grant also covers background access.
+            Permission.LocationBackground ->
+                if (sdkInt >= Build.VERSION_CODES.Q) PermissionMapper.androidManifestPermissions(permission) else listOf(ACCESS_FINE_LOCATION)
+
+            // READ_EXTERNAL_STORAGE has no effect from API 33; apps use scoped storage, the
+            // system pickers, or Photos for media.
+            Permission.Storage ->
+                if (sdkInt >= Build.VERSION_CODES.TIRAMISU) emptyList() else PermissionMapper.androidManifestPermissions(permission)
+
+            else -> PermissionMapper.androidManifestPermissions(permission)
+        }
+
+    /**
+     * Manifest permission(s) whose grant, without the full [manifestPermissions] set, means
+     * [permission] is usable with reduced scope ([io.github.ahmadhussain0335.kmppermission.PermissionStatus.Limited]).
+     */
+    fun partialGrantPermissions(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): List<String> =
+        when (permission) {
+            Permission.LocationFine -> if (sdkInt >= Build.VERSION_CODES.S) listOf(ACCESS_COARSE_LOCATION) else emptyList()
+            Permission.Photos -> optionalManifestPermissions(permission, sdkInt)
+            else -> emptyList()
+        }
+
+    /**
+     * Manifest permission(s) added to a request for [permission] only when the host app declares
+     * them. Declaring `READ_MEDIA_VISUAL_USER_SELECTED` on API 34+ lets the user pick specific photos
+     * and keeps that choice instead of granting temporary access.
+     */
+    fun optionalManifestPermissions(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): List<String> =
+        when (permission) {
+            Permission.Photos ->
+                if (sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) listOf(READ_MEDIA_VISUAL_USER_SELECTED) else emptyList()
+            else -> emptyList()
+        }
+
+    /**
+     * True if [permission] needs no system prompt on [sdkInt] and is always available: either it's
+     * a normal (install-time) permission there, or there is nothing left to grant at that level.
+     */
+    fun isAutoGranted(
+        permission: Permission,
+        sdkInt: Int = Build.VERSION.SDK_INT,
+        targetSdkInt: Int = appTargetSdk,
+    ): Boolean =
+        when (permission) {
+            Permission.LocalNetwork -> !isLocalNetworkEnforced(sdkInt, targetSdkInt)
+            Permission.BluetoothConnect, Permission.BluetoothAdvertise -> sdkInt < Build.VERSION_CODES.S
+            Permission.Storage -> sdkInt >= Build.VERSION_CODES.TIRAMISU
+            else -> false
+        }
+
+    /**
+     * True if [permission] has to be requested on its own, after foreground location is granted.
+     * From API 29 background location is granted separately; from API 30 the system ignores a
+     * request that mixes it with foreground location.
+     */
+    fun requiresSeparateRequest(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): Boolean =
+        permission == Permission.LocationBackground && sdkInt >= Build.VERSION_CODES.Q
+
+    // Apps targeting below SDK 37 keep an implicit grant, even on Android 17.
+    private fun isLocalNetworkEnforced(sdkInt: Int, targetSdkInt: Int): Boolean =
+        sdkInt >= API_37 && targetSdkInt >= API_37
+
+    /** The location permission BLE scanning needs below API 31: fine from API 29, coarse before. */
+    private fun bleScanLocationPermission(sdkInt: Int): String =
+        if (sdkInt >= Build.VERSION_CODES.Q) ACCESS_FINE_LOCATION else ACCESS_COARSE_LOCATION
+
+    /** Foreground location permissions, one of which must be granted before background location. */
+    val foregroundLocationPermissions: List<String> = listOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+}

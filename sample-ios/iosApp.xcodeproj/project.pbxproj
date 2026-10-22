@@ -451,7 +451,7 @@
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.kmp.permission.sample.ios.uitests$(TEAM_ID)";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.ahmadhussain0335.kmppermission.sample.ios.uitests$(TEAM_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -469,7 +469,7 @@
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.kmp.permission.sample.ios.uitests$(TEAM_ID)";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.ahmadhussain0335.kmppermission.sample.ios.uitests$(TEAM_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
