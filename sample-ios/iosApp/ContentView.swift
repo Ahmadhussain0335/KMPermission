@@ -15,6 +15,7 @@ private let demoItems: [PermissionDemoItem] = [
         title: "Bluetooth",
         permissions: [Permission.Bluetooth.shared, Permission.BluetoothScan.shared, Permission.BluetoothConnect.shared]
     ),
+    PermissionDemoItem(title: "Bluetooth Advertise", permissions: [Permission.BluetoothAdvertise.shared]),
     PermissionDemoItem(title: "Location", permissions: [Permission.LocationFine.shared, Permission.LocationCoarse.shared]),
     PermissionDemoItem(title: "Background Location", permissions: [Permission.LocationBackground.shared]),
     PermissionDemoItem(title: "Notifications", permissions: [Permission.Notifications.shared]),

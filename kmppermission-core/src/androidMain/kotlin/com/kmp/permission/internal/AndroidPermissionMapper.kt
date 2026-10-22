@@ -50,7 +50,7 @@ internal object AndroidPermissionMapper {
                     listOf(bleScanLocationPermission(sdkInt))
                 }
 
-            Permission.BluetoothConnect ->
+            Permission.BluetoothConnect, Permission.BluetoothAdvertise ->
                 if (sdkInt >= Build.VERSION_CODES.S) PermissionMapper.androidManifestPermissions(permission) else emptyList()
 
             // Below API 33 notifications have no runtime permission; see PermissionStatusResolver.
@@ -103,7 +103,7 @@ internal object AndroidPermissionMapper {
      */
     fun isAutoGranted(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): Boolean =
         when (permission) {
-            Permission.BluetoothConnect -> sdkInt < Build.VERSION_CODES.S
+            Permission.BluetoothConnect, Permission.BluetoothAdvertise -> sdkInt < Build.VERSION_CODES.S
             Permission.Storage -> sdkInt >= Build.VERSION_CODES.TIRAMISU
             else -> false
         }

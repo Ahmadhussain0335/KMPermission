@@ -12,6 +12,7 @@ val demoItems: List<PermissionDemoItem> = listOf(
     PermissionDemoItem("Camera", listOf(Permission.Camera)),
     PermissionDemoItem("Microphone", listOf(Permission.Microphone)),
     PermissionDemoItem("Bluetooth", listOf(Permission.Bluetooth, Permission.BluetoothScan, Permission.BluetoothConnect)),
+    PermissionDemoItem("Bluetooth Advertise", listOf(Permission.BluetoothAdvertise)),
     PermissionDemoItem("Location", listOf(Permission.LocationFine, Permission.LocationCoarse)),
     PermissionDemoItem("Background Location", listOf(Permission.LocationBackground)),
     PermissionDemoItem("Notifications", listOf(Permission.Notifications)),

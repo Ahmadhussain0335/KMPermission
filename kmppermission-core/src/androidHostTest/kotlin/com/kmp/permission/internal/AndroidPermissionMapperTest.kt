@@ -164,4 +164,19 @@ class AndroidPermissionMapperTest {
     fun photos_hasNoSelectedPhotosAccess_belowApi34() {
         assertTrue(AndroidPermissionMapper.optionalManifestPermissions(Permission.Photos, sdkInt = Build.VERSION_CODES.TIRAMISU).isEmpty())
     }
+
+    @Test
+    fun bluetoothAdvertise_requiresManifestEntry_fromApi31() {
+        assertFalse(AndroidPermissionMapper.isAutoGranted(Permission.BluetoothAdvertise, sdkInt = Build.VERSION_CODES.S))
+        assertEquals(
+            listOf("android.permission.BLUETOOTH_ADVERTISE"),
+            AndroidPermissionMapper.manifestPermissions(Permission.BluetoothAdvertise, sdkInt = Build.VERSION_CODES.S),
+        )
+    }
+
+    @Test
+    fun bluetoothAdvertise_isAutoGranted_belowApi31() {
+        assertTrue(AndroidPermissionMapper.isAutoGranted(Permission.BluetoothAdvertise, sdkInt = 30))
+        assertTrue(AndroidPermissionMapper.manifestPermissions(Permission.BluetoothAdvertise, sdkInt = 30).isEmpty())
+    }
 }

@@ -19,6 +19,7 @@ internal object PermissionMapper {
         Permission.Bluetooth,
         Permission.BluetoothScan,
         Permission.BluetoothConnect,
+        Permission.BluetoothAdvertise,
         Permission.LocationFine,
         Permission.LocationCoarse,
         Permission.LocationBackground,
@@ -42,6 +43,7 @@ internal object PermissionMapper {
         Permission.Bluetooth -> "bluetooth"
         Permission.BluetoothScan -> "bluetooth_scan"
         Permission.BluetoothConnect -> "bluetooth_connect"
+        Permission.BluetoothAdvertise -> "bluetooth_advertise"
         Permission.LocationFine -> "location_fine"
         Permission.LocationCoarse -> "location_coarse"
         Permission.LocationBackground -> "location_background"
@@ -69,6 +71,7 @@ internal object PermissionMapper {
         Permission.Bluetooth -> listOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN")
         Permission.BluetoothScan -> listOf("android.permission.BLUETOOTH_SCAN")
         Permission.BluetoothConnect -> listOf("android.permission.BLUETOOTH_CONNECT")
+        Permission.BluetoothAdvertise -> listOf("android.permission.BLUETOOTH_ADVERTISE")
         Permission.LocationFine -> listOf("android.permission.ACCESS_FINE_LOCATION")
         Permission.LocationCoarse -> listOf("android.permission.ACCESS_COARSE_LOCATION")
         Permission.LocationBackground -> listOf("android.permission.ACCESS_BACKGROUND_LOCATION")
@@ -89,7 +92,7 @@ internal object PermissionMapper {
     fun iosInfoPlistKeys(permission: Permission, iosMajorVersion: Int): List<String> = when (permission) {
         Permission.Camera -> listOf("NSCameraUsageDescription")
         Permission.Microphone -> listOf("NSMicrophoneUsageDescription")
-        Permission.Bluetooth, Permission.BluetoothScan, Permission.BluetoothConnect ->
+        Permission.Bluetooth, Permission.BluetoothScan, Permission.BluetoothConnect, Permission.BluetoothAdvertise ->
             listOf("NSBluetoothAlwaysUsageDescription")
         Permission.LocationFine, Permission.LocationCoarse -> listOf("NSLocationWhenInUseUsageDescription")
         // "Always" is granted as an upgrade from "When In Use", so iOS requires both strings.

@@ -40,6 +40,13 @@ sealed class Permission(val group: PermissionGroup) {
     data object BluetoothConnect : Permission(PermissionGroup.Bluetooth)
 
     /**
+     * Making the device discoverable to other Bluetooth devices (BLE advertising). Android API 31+:
+     * `BLUETOOTH_ADVERTISE`; below that the install-time `BLUETOOTH_ADMIN` covers it, so it is always
+     * granted. iOS: `NSBluetoothAlwaysUsageDescription`, sharing [Bluetooth]'s authorization.
+     */
+    data object BluetoothAdvertise : Permission(PermissionGroup.Bluetooth)
+
+    /**
      * Precise device location. Android: `ACCESS_FINE_LOCATION`, plus `ACCESS_COARSE_LOCATION` on API
      * 31+, which the system requires in the same request. iOS: `NSLocationWhenInUseUsageDescription`.
      * Reported as [PermissionStatus.Limited] when the user allowed only approximate location.

@@ -34,7 +34,8 @@ internal actual class PermissionController actual constructor() : PermissionEngi
         Permission.Camera -> AvMediaPermissionHandler(AVMediaTypeVideo)
         Permission.Microphone -> AvMediaPermissionHandler(AVMediaTypeAudio)
         Permission.Photos -> PhotosPermissionHandler()
-        Permission.Bluetooth, Permission.BluetoothScan, Permission.BluetoothConnect -> BluetoothPermissionHandler
+        Permission.Bluetooth, Permission.BluetoothScan, Permission.BluetoothConnect, Permission.BluetoothAdvertise ->
+            BluetoothPermissionHandler
         Permission.LocationFine -> LocationFineHandler()
         Permission.LocationCoarse -> LocationCoarseHandler()
         Permission.LocationBackground -> LocationBackgroundHandler()

@@ -76,7 +76,8 @@ private class BluetoothCoreImpl : NSObject(), CBCentralManagerDelegateProtocol {
 private val bluetoothCore: BluetoothCoreImpl by lazy { BluetoothCoreImpl() }
 
 /**
- * [Permission.Bluetooth], [Permission.BluetoothScan], and [Permission.BluetoothConnect] all share
+ * [Permission.Bluetooth], [Permission.BluetoothScan], [Permission.BluetoothConnect], and
+ * [Permission.BluetoothAdvertise] all share
  * this single authorization on iOS, so one handler covers all three (see [PermissionController]'s
  * dispatch).
  */

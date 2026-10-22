@@ -43,6 +43,7 @@ Declare what you use; the library checks and fails with a message naming the mis
 | `Bluetooth` | API 31+: `BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`. API 30 and below: `BLUETOOTH`, `BLUETOOTH_ADMIN` (declare with `maxSdkVersion="30"`) plus the scan location permission below | `NSBluetoothAlwaysUsageDescription` |
 | `BluetoothScan` | API 31+: `BLUETOOTH_SCAN`. API 29-30: `ACCESS_FINE_LOCATION`. API 26-28: `ACCESS_COARSE_LOCATION` | `NSBluetoothAlwaysUsageDescription` |
 | `BluetoothConnect` | `BLUETOOTH_CONNECT` (API 31+) | `NSBluetoothAlwaysUsageDescription` |
+| `BluetoothAdvertise` | `BLUETOOTH_ADVERTISE` (API 31+) | `NSBluetoothAlwaysUsageDescription` |
 | `LocationFine` | `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` | `NSLocationWhenInUseUsageDescription` |
 | `LocationCoarse` | `ACCESS_COARSE_LOCATION` | `NSLocationWhenInUseUsageDescription` |
 | `LocationBackground` | `ACCESS_BACKGROUND_LOCATION` and a foreground location permission | `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription` |
@@ -116,7 +117,7 @@ fun CameraScreen() {
 
 - Requires iOS 15 or later (the Kotlin/Native framework's minimum).
 - `LocationFine` reports `Limited` when Precise Location is off. Requesting again does not change that; the user has to turn Precise Location on in Settings. The library does not request temporary full accuracy.
-- `Bluetooth`, `BluetoothScan` and `BluetoothConnect` share one Core Bluetooth authorization.
+- `Bluetooth`, `BluetoothScan`, `BluetoothConnect` and `BluetoothAdvertise` share one Core Bluetooth authorization.
 
 ## Building and testing
 
