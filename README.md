@@ -1,6 +1,13 @@
 # KMPermission
 
+[![CI](https://github.com/Ahmadhussain0335/KMPermission/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ahmadhussain0335/KMPermission/actions/workflows/ci.yml)
+
 A Kotlin Multiplatform library for checking, requesting and observing runtime permissions on Android and iOS through one API, with an optional Compose Multiplatform layer.
+
+- 19 permissions, including the ones IoT and gateway apps need: Bluetooth scan/connect/advertise, nearby Wi-Fi and Android 17 local network access.
+- Six statuses, including `Limited` for partial grants and a reliable `Denied` versus `PermanentlyDenied` split on Android.
+- Suspend, callback and `Flow` APIs; `observe()` picks up changes made in system Settings.
+- Handles platform differences for you: Android API 26 to 37 gating, the background-location sequence, and iOS 17/18 calendar and contacts changes.
 
 ## Modules
 
@@ -11,7 +18,7 @@ A Kotlin Multiplatform library for checking, requesting and observing runtime pe
 | `sample-android` | Compose sample app. |
 | `sample-ios` | SwiftUI sample app using `KMPPermissionCore` (open `sample-ios/iosApp.xcodeproj`). |
 
-The library supports Android 8.0 (API 26) and later. It is not published to a repository yet; include the modules from source.
+The library supports Android 8.0 (API 26) and later and iOS 15 and later. It is not published to a repository yet; include the modules from source.
 
 ## Statuses
 
@@ -131,7 +138,7 @@ fun CameraScreen() {
 ./gradlew :kmppermission-core:compileKotlinIosSimulatorArm64      # iOS compile check
 ```
 
-iOS tests (`iosSimulatorArm64Test`) need an Apple-silicon Mac. To build the iOS sample, open `sample-ios/iosApp.xcodeproj` and set your team in `sample-ios/Configuration/Config.xcconfig`, or pass `TEAM_ID=<team>` to `xcodebuild`.
+Running the shared tests on the iOS simulator (`:kmppermission-core:iosSimulatorArm64Test`) locally needs an Apple-silicon Mac; CI runs them on every push. To build the iOS sample, open `sample-ios/iosApp.xcodeproj` and set your team in `sample-ios/Configuration/Config.xcconfig`, or pass `TEAM_ID=<team>` to `xcodebuild`.
 
 CI (`.github/workflows/ci.yml`) runs the host tests, lint, the shared tests on the iOS simulator, and builds both samples and the iOS UI tests on every push to `main` and every pull request.
 
@@ -145,3 +152,23 @@ xcodebuild test -project sample-ios/iosApp.xcodeproj -scheme iosAppUITests \
 ```
 
 With a free Personal Team, trust the developer certificate on the device first (Settings → General → VPN & Device Management).
+
+## Project status
+
+Version 0.1.0. Not yet published; the API may still change before 1.0.
+
+Tested on real devices:
+- Samsung Galaxy A53 (Android 16): denial and permanent denial, dismissed dialogs, approximate then precise location, the background-location sequence, selected photos, the Bluetooth and Nearby Wi-Fi group, notifications, contacts, calendar, changes made in Settings, and rotation during a dialog.
+- iPhone 13 (iOS 26.6): the full `iosAppUITests` suite.
+
+Not yet covered on a device: Android 12 and older, Android 17 with `LocalNetwork`, and on iOS "Allow Once", Location Services turned off, and the limited Photos and Contacts pickers.
+
+Known limitations:
+- Android: a system auto-deny is detected by timing (under 500 ms). If a user resets a once-denied permission to "Ask every time" in Settings, it reads as `PermanentlyDenied` until the next request.
+- iOS: prompt detection relies on the app's active/inactive notifications with short timeouts. The synchronous `check()` for notifications can block for up to 500 ms; `request()` and `observe()` do not block.
+- A request still waiting when its Android Activity is destroyed is cancelled (`CancellationException`), not resumed.
+
+Planned:
+- Publishing (Maven Central or an internal repository, with an XCFramework or Swift package for iOS), `explicitApi()` and binary-compatibility checks, and moving off the pre-release material3 and lifecycle dependencies.
+- An instrumented Android UI test suite matching the iOS one, plus Compose and Robolectric tests.
+- A Compose sample for iOS.
