@@ -19,4 +19,5 @@ val demoItems: List<PermissionDemoItem> = listOf(
     PermissionDemoItem("Calendar", listOf(Permission.Calendar)),
     PermissionDemoItem("Storage", listOf(Permission.Storage)),
     PermissionDemoItem("Photos", listOf(Permission.Photos)),
+    PermissionDemoItem("NFC", listOf(Permission.Nfc)),
 )

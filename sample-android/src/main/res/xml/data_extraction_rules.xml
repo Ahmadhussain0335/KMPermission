@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+. KMPermission's request history describes this install only; restored on a new
+     device it would report never-requested permissions as permanently denied. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="com.kmp.permission.requested_permissions.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="com.kmp.permission.requested_permissions.xml" />
+    </device-transfer>
+</data-extraction-rules>
