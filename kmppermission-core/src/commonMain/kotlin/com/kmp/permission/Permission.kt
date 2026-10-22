@@ -40,7 +40,10 @@ sealed class Permission(val group: PermissionGroup) {
     /** Approximate device location. Android: `ACCESS_COARSE_LOCATION`. iOS shares [LocationFine]'s authorization. */
     data object LocationCoarse : Permission(PermissionGroup.Location)
 
-    /** Location access while backgrounded. Android: `ACCESS_BACKGROUND_LOCATION`. iOS: `NSLocationAlwaysAndWhenInUseUsageDescription`. */
+    /**
+     * Location access while backgrounded. Android: `ACCESS_BACKGROUND_LOCATION`. iOS: both
+     * `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription`.
+     */
     data object LocationBackground : Permission(PermissionGroup.Location)
 
     /** Posting local/push notifications. Android 13+ (API 33+): `POST_NOTIFICATIONS`. iOS: `UNUserNotificationCenter` authorization. */
@@ -49,7 +52,10 @@ sealed class Permission(val group: PermissionGroup) {
     /** The user's contacts. Android: `READ_CONTACTS`. iOS: `NSContactsUsageDescription`. */
     data object Contacts : Permission(PermissionGroup.Contacts)
 
-    /** The user's calendar. Android: `READ_CALENDAR`. iOS: `NSCalendarsUsageDescription`. */
+    /**
+     * The user's calendar. Android: `READ_CALENDAR`. iOS 17+: `NSCalendarsFullAccessUsageDescription`;
+     * earlier iOS: `NSCalendarsUsageDescription`.
+     */
     data object Calendar : Permission(PermissionGroup.Calendar)
 
     /** General file/storage access. Android: `READ_EXTERNAL_STORAGE` pre-API 33, scoped storage otherwise. Unsupported on iOS. */

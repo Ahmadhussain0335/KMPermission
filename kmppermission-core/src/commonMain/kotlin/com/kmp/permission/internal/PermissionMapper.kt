@@ -59,20 +59,25 @@ internal object PermissionMapper {
     }
 
     /**
-     * iOS `Info.plist` usage-description key(s) [permission] requires. Empty either because
-     * [permission] is unsupported on iOS, or because it needs no usage description at all (e.g.
-     * [Permission.Notifications], which is authorized via `UNUserNotificationCenter` without one).
+     * Every iOS `Info.plist` usage-description key [permission] requires on [iosMajorVersion]. Empty
+     * either because [permission] is unsupported on iOS, or because it needs no usage description at
+     * all (e.g. [Permission.Notifications], which is authorized via `UNUserNotificationCenter`).
      */
-    fun iosInfoPlistKeys(permission: Permission): List<String> = when (permission) {
+    fun iosInfoPlistKeys(permission: Permission, iosMajorVersion: Int): List<String> = when (permission) {
         Permission.Camera -> listOf("NSCameraUsageDescription")
         Permission.Microphone -> listOf("NSMicrophoneUsageDescription")
         Permission.Bluetooth, Permission.BluetoothScan, Permission.BluetoothConnect ->
             listOf("NSBluetoothAlwaysUsageDescription")
         Permission.LocationFine, Permission.LocationCoarse -> listOf("NSLocationWhenInUseUsageDescription")
-        Permission.LocationBackground -> listOf("NSLocationAlwaysAndWhenInUseUsageDescription")
+        // "Always" is granted as an upgrade from "When In Use", so iOS requires both strings.
+        Permission.LocationBackground ->
+            listOf("NSLocationWhenInUseUsageDescription", "NSLocationAlwaysAndWhenInUseUsageDescription")
         Permission.Notifications -> emptyList()
         Permission.Contacts -> listOf("NSContactsUsageDescription")
-        Permission.Calendar -> listOf("NSCalendarsUsageDescription")
+        // iOS 17 replaced the single calendar key with separate full-access and write-only keys; the
+        // library requests full access there.
+        Permission.Calendar ->
+            if (iosMajorVersion >= 17) listOf("NSCalendarsFullAccessUsageDescription") else listOf("NSCalendarsUsageDescription")
         Permission.Storage -> emptyList()
         Permission.Photos -> listOf("NSPhotoLibraryUsageDescription")
         Permission.Nfc -> emptyList()
