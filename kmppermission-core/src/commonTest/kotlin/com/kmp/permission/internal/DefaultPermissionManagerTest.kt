@@ -144,4 +144,17 @@ class DefaultPermissionManagerTest {
 
         assertEquals(PermissionStatus.Granted, manager.observe(Permission.Camera).first())
     }
+
+    @Test
+    fun observe_batch_unsupportedPermission_throws() {
+        val manager = DefaultPermissionManager(
+            FakePermissionEngine(),
+            PermissionRegistry(),
+            CoroutineScope(Dispatchers.Unconfined),
+        )
+
+        assertFailsWith<PermissionException.UnsupportedPermission> {
+            manager.observe(Permission.Camera, unsupportedPermission())
+        }
+    }
 }

@@ -74,6 +74,7 @@ internal class DefaultPermissionManager(
     override fun observe(vararg permissions: Permission): Flow<Map<Permission, PermissionStatus>> {
         val requested = permissions.toSet()
         PermissionValidator.requireNotEmpty(requested)
+        requested.forEach(PermissionValidator::requireSupported)
         return registry.statusFlow(requested)
             .onStart { requested.forEach { registry.update(it, engine.status(it)) } }
     }
