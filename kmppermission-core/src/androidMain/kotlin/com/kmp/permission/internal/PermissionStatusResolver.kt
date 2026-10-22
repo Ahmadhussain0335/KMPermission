@@ -2,7 +2,9 @@ package com.kmp.permission.internal
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.kmp.permission.Permission
 import com.kmp.permission.PermissionStatus
@@ -10,38 +12,52 @@ import com.kmp.permission.PermissionStatus
 /**
  * Derives a [PermissionStatus] from the OS's current grant state plus [RequestedPermissionsStore]'s
  * history — the shared logic behind both [PermissionController.status] and its post-request result
- * mapping. See [AndroidStatusRules] for the decision itself.
+ * mapping. See [AndroidStatusRules] for the denial logic.
  */
 internal class PermissionStatusResolver(
     private val context: Context,
     private val requestedStore: RequestedPermissionsStore,
 ) {
 
-    fun resolve(permission: Permission, activity: ComponentActivity?): PermissionStatus {
-        if (AndroidPermissionMapper.isAutoGrantedBelowRuntime(permission)) return PermissionStatus.Granted
-
-        val granted = isGranted(permission)
-        val canShowRationale = canShowRationale(permission, activity)
-        val history = AndroidStatusRules.observed(granted, canShowRationale, requestedStore.history(permission))
-        requestedStore.save(permission, history)
-        return AndroidStatusRules.status(granted, canShowRationale, history)
-    }
+    fun resolve(permission: Permission, activity: ComponentActivity?): PermissionStatus =
+        resolve(permission, activity, AndroidStatusRules::observed)
 
     /** Records that a request for [permission] just completed, then resolves its status. */
-    fun resolveAfterRequest(permission: Permission, activity: ComponentActivity): PermissionStatus {
-        if (AndroidPermissionMapper.isAutoGrantedBelowRuntime(permission)) return PermissionStatus.Granted
+    fun resolveAfterRequest(permission: Permission, activity: ComponentActivity): PermissionStatus =
+        resolve(permission, activity, AndroidStatusRules::afterRequest)
 
-        val granted = isGranted(permission)
+    private fun resolve(
+        permission: Permission,
+        activity: ComponentActivity?,
+        updateHistory: (granted: Boolean, canShowRationale: Boolean, history: RequestHistory) -> RequestHistory,
+    ): PermissionStatus {
+        if (AndroidPermissionMapper.isAutoGranted(permission)) return PermissionStatus.Granted
+        if (permission == Permission.Notifications && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            // No runtime permission exists; the user can only turn notifications off in Settings.
+            return if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+                PermissionStatus.Granted
+            } else {
+                PermissionStatus.PermanentlyDenied
+            }
+        }
+
+        val fullyGranted = AndroidPermissionMapper.manifestPermissions(permission).all(::isGranted)
+        val partiallyGranted = !fullyGranted && AndroidPermissionMapper.partialGrantPermissions(permission).any(::isGranted)
         val canShowRationale = canShowRationale(permission, activity)
-        val history = AndroidStatusRules.afterRequest(granted, canShowRationale, requestedStore.history(permission))
+
+        // A partial grant behaves like a grant for history: the system will prompt again to widen it.
+        val history = updateHistory(fullyGranted || partiallyGranted, canShowRationale, requestedStore.history(permission))
         requestedStore.save(permission, history)
-        return AndroidStatusRules.status(granted, canShowRationale, history)
+
+        return if (partiallyGranted) {
+            PermissionStatus.Limited
+        } else {
+            AndroidStatusRules.status(fullyGranted, canShowRationale, history)
+        }
     }
 
-    private fun isGranted(permission: Permission): Boolean =
-        AndroidPermissionMapper.manifestPermissions(permission).all {
-            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-        }
+    private fun isGranted(manifestPermission: String): Boolean =
+        ContextCompat.checkSelfPermission(context, manifestPermission) == PackageManager.PERMISSION_GRANTED
 
     private fun canShowRationale(permission: Permission, activity: ComponentActivity?): Boolean =
         activity != null &&

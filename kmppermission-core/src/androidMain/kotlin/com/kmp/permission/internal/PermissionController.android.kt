@@ -1,11 +1,13 @@
 package com.kmp.permission.internal
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.kmp.permission.Permission
@@ -94,25 +96,59 @@ internal actual class PermissionController actual constructor() : PermissionEngi
 
     private suspend fun requestOnMain(permissions: Set<Permission>): Map<Permission, PermissionStatus> {
         val activeHost = host ?: throw PermissionException.ManagerNotAttached()
-        permissions.forEach { ManifestPermissionChecker.requireDeclared(activeHost.activity, it) }
+        val activity = activeHost.activity
+        permissions.forEach { ManifestPermissionChecker.requireDeclared(activity, it) }
 
-        val (autoGranted, needsPrompt) = permissions.partition { AndroidPermissionMapper.isAutoGrantedBelowRuntime(it) }
+        // Permissions with nothing to prompt for on this SDK resolve straight from the current state.
+        val (prompted, unprompted) = permissions.partition {
+            !AndroidPermissionMapper.isAutoGranted(it) && AndroidPermissionMapper.manifestPermissions(it).isNotEmpty()
+        }
+        val (separate, together) = prompted.partition { AndroidPermissionMapper.requiresSeparateRequest(it) }
 
         val results = mutableMapOf<Permission, PermissionStatus>()
-        autoGranted.forEach { results[it] = PermissionStatus.Granted }
+        unprompted.forEach { results[it] = activeHost.resolver.resolve(it, activity) }
 
-        if (needsPrompt.isNotEmpty()) {
-            val manifestPermissions = needsPrompt
-                .flatMap { AndroidPermissionMapper.manifestPermissions(it) }
-                .distinct()
-                .toTypedArray()
-
-            requestMutex.withLock { launchAndAwait(activeHost, manifestPermissions) }
-
-            needsPrompt.forEach { results[it] = activeHost.resolver.resolveAfterRequest(it, activeHost.activity) }
+        requestMutex.withLock {
+            if (together.isNotEmpty()) {
+                launchAndAwait(activeHost, requestArray(activity, together))
+                together.forEach { results[it] = activeHost.resolver.resolveAfterRequest(it, activity) }
+            }
+            separate.forEach { permission ->
+                // Background location is only offered once foreground location is granted, so ask
+                // for that first, as iOS does with "When In Use" before "Always".
+                if (!hasForegroundLocation(activity)) {
+                    launchAndAwait(activeHost, foregroundLocationRequest(activity, permission))
+                }
+                results[permission] = if (hasForegroundLocation(activity)) {
+                    launchAndAwait(activeHost, requestArray(activity, listOf(permission)))
+                    activeHost.resolver.resolveAfterRequest(permission, activity)
+                } else {
+                    activeHost.resolver.resolve(permission, activity)
+                }
+            }
         }
 
         return results
+    }
+
+    private fun requestArray(activity: ComponentActivity, permissions: List<Permission>): Array<String> =
+        permissions.flatMap { permission ->
+            AndroidPermissionMapper.manifestPermissions(permission) +
+                AndroidPermissionMapper.optionalManifestPermissions(permission)
+                    .filter { ManifestPermissionChecker.isDeclared(activity, it) }
+        }.distinct().toTypedArray()
+
+    private fun hasForegroundLocation(activity: ComponentActivity): Boolean =
+        AndroidPermissionMapper.foregroundLocationPermissions.any {
+            ContextCompat.checkSelfPermission(activity, it) == PackageManager.PERMISSION_GRANTED
+        }
+
+    private fun foregroundLocationRequest(activity: ComponentActivity, permission: Permission): Array<String> {
+        val declared = AndroidPermissionMapper.foregroundLocationPermissions.filter { ManifestPermissionChecker.isDeclared(activity, it) }
+        if (declared.isEmpty()) {
+            throw PermissionException.ManifestPermissionMissing(permission, AndroidPermissionMapper.foregroundLocationPermissions)
+        }
+        return declared.toTypedArray()
     }
 
     private suspend fun launchAndAwait(host: Host, manifestPermissions: Array<String>) {

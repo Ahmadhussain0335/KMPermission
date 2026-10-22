@@ -17,14 +17,23 @@ internal object ManifestPermissionChecker {
         val required = AndroidPermissionMapper.manifestPermissions(permission)
         if (required.isEmpty()) return
 
-        val declared = declaredPermissions(context)
-        val missing = required.filterNot { it in declared }
+        val missing = required.filterNot { isDeclared(context, it) }
         if (missing.isNotEmpty()) {
             throw PermissionException.ManifestPermissionMissing(permission, missing)
         }
     }
 
-    private fun declaredPermissions(context: Context): Set<String> {
+    fun isDeclared(context: Context, manifestPermission: String): Boolean =
+        manifestPermission in declaredPermissions(context)
+
+    // The declared set is fixed for the lifetime of the process, so the package manager IPC runs once.
+    @Volatile
+    private var cachedDeclared: Set<String>? = null
+
+    private fun declaredPermissions(context: Context): Set<String> =
+        cachedDeclared ?: readDeclaredPermissions(context).also { cachedDeclared = it }
+
+    private fun readDeclaredPermissions(context: Context): Set<String> {
         val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.packageManager.getPackageInfo(
                 context.packageName,

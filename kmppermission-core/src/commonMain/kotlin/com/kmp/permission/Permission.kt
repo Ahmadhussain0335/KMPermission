@@ -23,7 +23,8 @@ sealed class Permission(val group: PermissionGroup) {
     data object Microphone : Permission(PermissionGroup.Microphone)
 
     /**
-     * Legacy Bluetooth access. Android (API 30 and below): `BLUETOOTH`/`BLUETOOTH_ADMIN`. iOS:
+     * General Bluetooth access. Android API 31+: `BLUETOOTH_SCAN` and `BLUETOOTH_CONNECT`; API 30 and
+     * below: the install-time `BLUETOOTH`/`BLUETOOTH_ADMIN`, always granted. iOS:
      * `NSBluetoothAlwaysUsageDescription` (Core Bluetooth).
      */
     data object Bluetooth : Permission(PermissionGroup.Bluetooth)
@@ -34,19 +35,29 @@ sealed class Permission(val group: PermissionGroup) {
     /** Connecting to already-paired Bluetooth devices. Android 12+ (API 31+) only: `BLUETOOTH_CONNECT`. */
     data object BluetoothConnect : Permission(PermissionGroup.Bluetooth)
 
-    /** Precise device location. Android: `ACCESS_FINE_LOCATION`. iOS: `NSLocationWhenInUseUsageDescription`. */
+    /**
+     * Precise device location. Android: `ACCESS_FINE_LOCATION`, plus `ACCESS_COARSE_LOCATION` on API
+     * 31+, which the system requires in the same request. iOS: `NSLocationWhenInUseUsageDescription`.
+     * Reported as [PermissionStatus.Limited] when the user allowed only approximate location.
+     */
     data object LocationFine : Permission(PermissionGroup.Location)
 
     /** Approximate device location. Android: `ACCESS_COARSE_LOCATION`. iOS shares [LocationFine]'s authorization. */
     data object LocationCoarse : Permission(PermissionGroup.Location)
 
     /**
-     * Location access while backgrounded. Android: `ACCESS_BACKGROUND_LOCATION`. iOS: both
-     * `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription`.
+     * Location access while backgrounded. Android API 29+: `ACCESS_BACKGROUND_LOCATION`, requested
+     * after foreground location (requesting it asks for foreground location first if needed; on API
+     * 30+ the system shows a Settings page for it); below API 29 foreground location covers it. iOS:
+     * both `NSLocationWhenInUseUsageDescription` and `NSLocationAlwaysAndWhenInUseUsageDescription`.
      */
     data object LocationBackground : Permission(PermissionGroup.Location)
 
-    /** Posting local/push notifications. Android 13+ (API 33+): `POST_NOTIFICATIONS`. iOS: `UNUserNotificationCenter` authorization. */
+    /**
+     * Posting local/push notifications. Android 13+ (API 33+): `POST_NOTIFICATIONS`; below that,
+     * reflects whether notifications are enabled in Settings. iOS: `UNUserNotificationCenter`
+     * authorization.
+     */
     data object Notifications : Permission(PermissionGroup.Notifications)
 
     /** The user's contacts. Android: `READ_CONTACTS`. iOS: `NSContactsUsageDescription`. */
@@ -58,10 +69,19 @@ sealed class Permission(val group: PermissionGroup) {
      */
     data object Calendar : Permission(PermissionGroup.Calendar)
 
-    /** General file/storage access. Android: `READ_EXTERNAL_STORAGE` pre-API 33, scoped storage otherwise. Unsupported on iOS. */
+    /**
+     * Reading shared storage. Android below API 33: `READ_EXTERNAL_STORAGE`. API 33+ has no storage
+     * permission (apps use scoped storage and the system pickers; use [Photos] for media), so this
+     * is always [PermissionStatus.Granted] there. Unsupported on iOS.
+     */
     data object Storage : Permission(PermissionGroup.Storage)
 
-    /** The photo/video library. Android 13+ (API 33+): `READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO`. iOS: `NSPhotoLibraryUsageDescription`. */
+    /**
+     * The photo/video library. Android 13+ (API 33+): `READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO`; below
+     * that `READ_EXTERNAL_STORAGE`. On API 34+, also declare `READ_MEDIA_VISUAL_USER_SELECTED` to
+     * support selected-photos access, reported as [PermissionStatus.Limited]. iOS:
+     * `NSPhotoLibraryUsageDescription`.
+     */
     data object Photos : Permission(PermissionGroup.Photos)
 
     /** Near-field communication. Android only: `NFC`. Unsupported on iOS. */
