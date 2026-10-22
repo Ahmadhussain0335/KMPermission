@@ -33,9 +33,8 @@ internal class PhotosPermissionHandler : IosPermissionHandler {
         PHAuthorizationStatusNotDetermined -> PermissionStatus.NotDetermined
         PHAuthorizationStatusRestricted -> PermissionStatus.Restricted
         PHAuthorizationStatusDenied -> PermissionStatus.PermanentlyDenied
-        // Limited: the user picked specific photos rather than granting full access — still usable,
-        // so treated as Granted rather than introducing a sixth PermissionStatus case for it.
-        PHAuthorizationStatusAuthorized, PHAuthorizationStatusLimited -> PermissionStatus.Granted
+        PHAuthorizationStatusAuthorized -> PermissionStatus.Granted
+        PHAuthorizationStatusLimited -> PermissionStatus.Limited
         else -> PermissionStatus.Denied
     }
 }

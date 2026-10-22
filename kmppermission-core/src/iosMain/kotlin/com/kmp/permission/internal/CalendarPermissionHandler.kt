@@ -4,8 +4,10 @@ import com.kmp.permission.PermissionStatus
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.EventKit.EKAuthorizationStatus
 import platform.EventKit.EKAuthorizationStatusDenied
+import platform.EventKit.EKAuthorizationStatusFullAccess
 import platform.EventKit.EKAuthorizationStatusNotDetermined
 import platform.EventKit.EKAuthorizationStatusRestricted
+import platform.EventKit.EKAuthorizationStatusWriteOnly
 import platform.EventKit.EKEntityType
 import platform.EventKit.EKEventStore
 import kotlin.coroutines.resume
@@ -35,7 +37,9 @@ internal class CalendarPermissionHandler : IosPermissionHandler {
         EKAuthorizationStatusNotDetermined -> PermissionStatus.NotDetermined
         EKAuthorizationStatusRestricted -> PermissionStatus.Restricted
         EKAuthorizationStatusDenied -> PermissionStatus.PermanentlyDenied
-        // fullAccess and the iOS 17+ writeOnly grant are both treated as usable access.
-        else -> PermissionStatus.Granted
+        // FullAccess has the same raw value as the pre-iOS 17 Authorized status.
+        EKAuthorizationStatusFullAccess -> PermissionStatus.Granted
+        EKAuthorizationStatusWriteOnly -> PermissionStatus.Limited
+        else -> PermissionStatus.Denied
     }
 }

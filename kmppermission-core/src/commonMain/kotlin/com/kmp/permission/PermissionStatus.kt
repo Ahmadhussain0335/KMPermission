@@ -11,6 +11,16 @@ sealed interface PermissionStatus {
     /** Granted; the guarded feature can be used immediately. */
     data object Granted : PermissionStatus
 
+    /**
+     * Partly granted: the feature works, but with reduced scope. Requesting again or opening
+     * settings can widen it. Reported for:
+     * - [Permission.Photos]: the user picked specific photos (iOS Limited, Android 14+ selected photos).
+     * - [Permission.Contacts]: the user shared specific contacts (iOS 18+).
+     * - [Permission.Calendar]: write-only access (iOS 17+).
+     * - [Permission.LocationFine]: only approximate location was allowed.
+     */
+    data object Limited : PermissionStatus
+
     /** Denied, but the user can still be asked again — a rationale may help. */
     data object Denied : PermissionStatus
 

@@ -14,6 +14,7 @@ import com.kmp.permission.PermissionStatus
 fun StatusBadge(status: PermissionStatus, modifier: Modifier = Modifier) {
     val (label, color) = when (status) {
         PermissionStatus.Granted -> "Granted" to Color(0xFF2E7D32)
+        PermissionStatus.Limited -> "Limited" to Color(0xFF558B2F)
         PermissionStatus.Denied -> "Denied" to Color(0xFFEF6C00)
         PermissionStatus.PermanentlyDenied -> "Blocked — use Settings" to Color(0xFFC62828)
         PermissionStatus.Restricted -> "Restricted" to Color(0xFF616161)
@@ -35,5 +36,6 @@ fun worstStatus(statuses: List<PermissionStatus>): PermissionStatus = when {
     statuses.any { it == PermissionStatus.Restricted } -> PermissionStatus.Restricted
     statuses.any { it == PermissionStatus.Denied } -> PermissionStatus.Denied
     statuses.any { it == PermissionStatus.NotDetermined } -> PermissionStatus.NotDetermined
+    statuses.any { it == PermissionStatus.Limited } -> PermissionStatus.Limited
     else -> PermissionStatus.Granted
 }

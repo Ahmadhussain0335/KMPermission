@@ -14,7 +14,11 @@ import kotlinx.coroutines.launch
 @Stable
 interface MultiplePermissionsState {
     val permissions: List<PermissionState>
+
+    /** True if every permission is [PermissionStatus.Granted]; [PermissionStatus.Limited] does not count. */
     val allGranted: Boolean
+
+    /** True if at least one permission is [PermissionStatus.Granted]; [PermissionStatus.Limited] does not count. */
     val anyGranted: Boolean
 
     /** Requests every permission in [permissions] in a single batched system prompt where supported. */

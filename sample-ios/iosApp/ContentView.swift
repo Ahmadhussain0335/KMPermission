@@ -30,12 +30,14 @@ private func worstStatus(_ statuses: [PermissionStatus]) -> PermissionStatus {
     if statuses.contains(where: { $0 is PermissionStatusRestricted }) { return PermissionStatusRestricted.shared }
     if statuses.contains(where: { $0 is PermissionStatusDenied }) { return PermissionStatusDenied.shared }
     if statuses.contains(where: { $0 is PermissionStatusNotDetermined }) { return PermissionStatusNotDetermined.shared }
+    if statuses.contains(where: { $0 is PermissionStatusLimited }) { return PermissionStatusLimited.shared }
     return PermissionStatusGranted.shared
 }
 
 private func label(for status: PermissionStatus) -> String {
     switch status {
     case is PermissionStatusGranted: return "Granted"
+    case is PermissionStatusLimited: return "Limited"
     case is PermissionStatusDenied: return "Denied"
     case is PermissionStatusPermanentlyDenied: return "Blocked — use Settings"
     case is PermissionStatusRestricted: return "Restricted"
@@ -47,6 +49,7 @@ private func label(for status: PermissionStatus) -> String {
 private func color(for status: PermissionStatus) -> Color {
     switch status {
     case is PermissionStatusGranted: return .green
+    case is PermissionStatusLimited: return .mint
     case is PermissionStatusDenied: return .orange
     case is PermissionStatusPermanentlyDenied: return .red
     case is PermissionStatusRestricted: return .gray

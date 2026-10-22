@@ -3,6 +3,7 @@ package com.kmp.permission.internal
 import com.kmp.permission.PermissionStatus
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
+import platform.CoreLocation.CLAccuracyAuthorization
 import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
@@ -45,6 +46,9 @@ private class LocationCoreImpl : NSObject(), CLLocationManagerDelegateProtocol {
     private val statusReader by lazy { CLLocationManager() }
 
     fun authorizationStatus(): CLAuthorizationStatus = statusReader.authorizationStatus
+
+    fun hasReducedAccuracy(): Boolean =
+        statusReader.accuracyAuthorization == CLAccuracyAuthorization.CLAccuracyAuthorizationReducedAccuracy
 
     private fun delegateManager(): CLLocationManager =
         manager ?: CLLocationManager().also {
@@ -133,11 +137,12 @@ private fun mapAuthorization(status: CLAuthorizationStatus): PermissionStatus = 
 
 internal class LocationFineHandler : IosPermissionHandler {
 
-    // NOTE: iOS 14+ also has a separate "precise location" (CLAccuracyAuthorization) toggle
-    // orthogonal to authorization status — a user can be authorized but have precise location
-    // switched off in Settings. Distinguishing that here is a known future enhancement; for now
-    // LocationFine and LocationCoarse both resolve from authorization status alone.
-    override fun status(): PermissionStatus = mapAuthorization(locationCore.authorizationStatus())
+    // iOS 14+ has a "Precise Location" toggle separate from authorization; with it off the app only
+    // gets approximate fixes, which is what LocationCoarse asks for but less than LocationFine.
+    override fun status(): PermissionStatus {
+        val status = mapAuthorization(locationCore.authorizationStatus())
+        return if (status == PermissionStatus.Granted && locationCore.hasReducedAccuracy()) PermissionStatus.Limited else status
+    }
 
     override suspend fun request(): PermissionStatus {
         locationCore.requestWhenInUse()

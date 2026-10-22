@@ -5,6 +5,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.Contacts.CNAuthorizationStatus
 import platform.Contacts.CNAuthorizationStatusAuthorized
 import platform.Contacts.CNAuthorizationStatusDenied
+import platform.Contacts.CNAuthorizationStatusLimited
 import platform.Contacts.CNAuthorizationStatusNotDetermined
 import platform.Contacts.CNAuthorizationStatusRestricted
 import platform.Contacts.CNContactStore
@@ -32,6 +33,7 @@ internal class ContactsPermissionHandler : IosPermissionHandler {
         CNAuthorizationStatusRestricted -> PermissionStatus.Restricted
         CNAuthorizationStatusDenied -> PermissionStatus.PermanentlyDenied
         CNAuthorizationStatusAuthorized -> PermissionStatus.Granted
-        else -> PermissionStatus.Granted // Covers CNAuthorizationStatusLimited on iOS 18+ SDKs.
+        CNAuthorizationStatusLimited -> PermissionStatus.Limited
+        else -> PermissionStatus.Denied
     }
 }
