@@ -43,13 +43,17 @@ private class LocationCoreImpl : NSObject(), CLLocationManagerDelegateProtocol {
     private var signals: Channel<LocationSignal>? = null
     private var awaitingChangeFrom: CLAuthorizationStatus? = null
 
-    // Reading status needs no delegate, so this one may be created on any thread.
+    // Used only until the delegate-bearing manager exists; reading status needs no delegate, so this
+    // one may be created on any thread. Once the delegate manager exists it is the source of truth:
+    // a second instance can lag behind the one that just received the authorization callback.
     private val statusReader by lazy { CLLocationManager() }
 
-    fun authorizationStatus(): CLAuthorizationStatus = statusReader.authorizationStatus
+    private fun reader(): CLLocationManager = manager ?: statusReader
+
+    fun authorizationStatus(): CLAuthorizationStatus = reader().authorizationStatus
 
     fun hasReducedAccuracy(): Boolean =
-        statusReader.accuracyAuthorization == CLAccuracyAuthorization.CLAccuracyAuthorizationReducedAccuracy
+        reader().accuracyAuthorization == CLAccuracyAuthorization.CLAccuracyAuthorizationReducedAccuracy
 
     private fun delegateManager(): CLLocationManager =
         manager ?: CLLocationManager().also {
