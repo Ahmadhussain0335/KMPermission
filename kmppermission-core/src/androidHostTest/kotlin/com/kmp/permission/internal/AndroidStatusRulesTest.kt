@@ -1,8 +1,11 @@
 package com.kmp.permission.internal
 
+import com.kmp.permission.Permission
 import com.kmp.permission.PermissionStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class AndroidStatusRulesTest {
 
@@ -91,5 +94,16 @@ class AndroidStatusRulesTest {
         val history = AndroidStatusRules.observed(granted = false, canShowRationale = true, history = RequestHistory(requested = true))
 
         assertEquals(RequestHistory(requested = true, rationaleSeen = true), history)
+    }
+
+    @Test
+    fun backgroundLocationRationale_isIgnored_untilRequested() {
+        assertFalse(AndroidStatusRules.effectiveRationale(Permission.LocationBackground, rawRationale = true, history = RequestHistory()))
+        assertTrue(AndroidStatusRules.effectiveRationale(Permission.LocationBackground, rawRationale = true, history = RequestHistory(requested = true)))
+    }
+
+    @Test
+    fun otherPermissionsRationale_isUsedAsIs() {
+        assertTrue(AndroidStatusRules.effectiveRationale(Permission.Camera, rawRationale = true, history = RequestHistory()))
     }
 }

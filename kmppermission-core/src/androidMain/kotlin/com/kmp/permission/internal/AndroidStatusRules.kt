@@ -1,5 +1,6 @@
 package com.kmp.permission.internal
 
+import com.kmp.permission.Permission
 import com.kmp.permission.PermissionStatus
 
 /**
@@ -13,6 +14,13 @@ internal object AndroidStatusRules {
      * refused without showing one.
      */
     const val AUTO_DENY_THRESHOLD_MS = 500L
+
+    /**
+     * `shouldShowRequestPermissionRationale` as the rules should see it. For background location,
+     * Android returns `true` before it has ever been requested, which is not a denial.
+     */
+    fun effectiveRationale(permission: Permission, rawRationale: Boolean, history: RequestHistory): Boolean =
+        rawRationale && (permission != Permission.LocationBackground || history.requested)
 
     fun status(granted: Boolean, canShowRationale: Boolean, history: RequestHistory): PermissionStatus = when {
         granted -> PermissionStatus.Granted

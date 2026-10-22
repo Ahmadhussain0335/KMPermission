@@ -50,10 +50,14 @@ internal class PermissionStatusResolver(
 
         val fullyGranted = AndroidPermissionMapper.manifestPermissions(permission).all(::isGranted)
         val partiallyGranted = !fullyGranted && AndroidPermissionMapper.partialGrantPermissions(permission).any(::isGranted)
-        val canShowRationale = canShowRationale(permission, activity)
+        val rawRationale = canShowRationale(permission, activity)
+        var canShowRationale = rawRationale
 
         // A partial grant behaves like a grant for history: the system will prompt again to widen it.
-        val history = requestedStore.update(permission) { updateHistory(fullyGranted || partiallyGranted, canShowRationale, it) }
+        val history = requestedStore.update(permission) { previous ->
+            canShowRationale = AndroidStatusRules.effectiveRationale(permission, rawRationale, previous)
+            updateHistory(fullyGranted || partiallyGranted, canShowRationale, previous)
+        }
 
         return if (partiallyGranted) {
             PermissionStatus.Limited
