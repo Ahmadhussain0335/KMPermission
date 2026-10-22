@@ -3,11 +3,23 @@ package com.kmp.permission.internal
 import com.kmp.permission.Permission
 import com.kmp.permission.PermissionException
 import com.kmp.permission.PermissionStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import platform.AVFoundation.AVMediaTypeAudio
 import platform.AVFoundation.AVMediaTypeVideo
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
+
+/**
+ * Process-wide because the Bluetooth and Location handlers share one native manager each, and iOS
+ * shows one system prompt at a time anyway.
+ */
+private val requestMutex = Mutex()
 
 /**
  * Real iOS runtime engine. Dispatches each [Permission] to the native Apple framework handler that
@@ -38,11 +50,17 @@ internal actual class PermissionController actual constructor() : PermissionEngi
 
     actual override suspend fun request(permissions: Set<Permission>): Map<Permission, PermissionStatus> {
         permissions.forEach(InfoPlistChecker::requireDeclared)
-        return permissions.associateWith { handlerFor(it).request() }
+        // Native managers deliver their callbacks on the thread they were created on, and that
+        // thread needs a run loop, so every request runs on main.
+        return withContext(Dispatchers.Main) {
+            requestMutex.withLock { permissions.associateWith { handlerFor(it).request() } }
+        }
     }
 
     actual override fun openSettings() {
         val url = NSURL.URLWithString(UIApplicationOpenSettingsURLString) ?: return
-        UIApplication.sharedApplication.openURL(url, options = emptyMap<Any?, Any>()) {}
+        dispatch_async(dispatch_get_main_queue()) {
+            UIApplication.sharedApplication.openURL(url, options = emptyMap<Any?, Any>()) {}
+        }
     }
 }

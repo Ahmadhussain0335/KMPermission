@@ -5,6 +5,7 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
+import platform.CoreBluetooth.CBCentralManagerOptionShowPowerAlertKey
 import platform.CoreBluetooth.CBManager
 import platform.CoreBluetooth.CBManagerAuthorization
 import platform.CoreBluetooth.CBManagerAuthorizationAllowedAlways
@@ -33,17 +34,30 @@ private class BluetoothCoreImpl : NSObject(), CBCentralManagerDelegateProtocol {
 
     fun authorization(): CBManagerAuthorization = CBManager.authorization
 
+    /**
+     * Must run on the main thread: `queue = null` delivers delegate callbacks on the main queue.
+     * [PermissionController] guarantees that and serializes calls, so one pending continuation is enough.
+     */
     suspend fun request() {
         if (authorization() != CBManagerAuthorizationNotDetermined) return
         suspendCancellableCoroutine { continuation ->
             pendingContinuation = continuation
-            manager = CBCentralManager(delegate = this, queue = null)
+            continuation.invokeOnCancellation { pendingContinuation = null }
+            manager = CBCentralManager(
+                delegate = this,
+                queue = null,
+                // Only the authorization prompt is wanted here, not the "Turn On Bluetooth" alert.
+                options = mapOf<Any?, Any>(CBCentralManagerOptionShowPowerAlertKey to false),
+            )
         }
     }
 
     override fun centralManagerDidUpdateState(central: CBCentralManager) {
-        pendingContinuation?.resume(Unit)
+        // State updates can arrive before the user has answered the prompt.
+        if (authorization() == CBManagerAuthorizationNotDetermined) return
+        val continuation = pendingContinuation ?: return
         pendingContinuation = null
+        continuation.resume(Unit)
     }
 }
 
