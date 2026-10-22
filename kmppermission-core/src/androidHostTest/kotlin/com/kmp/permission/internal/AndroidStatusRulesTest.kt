@@ -6,9 +6,18 @@ import kotlin.test.assertEquals
 
 class AndroidStatusRulesTest {
 
-    /** Runs one completed request through the rules and returns the resulting status and history. */
-    private fun deny(history: RequestHistory, canShowRationale: Boolean): Pair<PermissionStatus, RequestHistory> {
-        val updated = AndroidStatusRules.afterRequest(granted = false, canShowRationale = canShowRationale, history = history)
+    /** Runs one completed, denied request through the rules and returns the resulting status and history. */
+    private fun deny(
+        history: RequestHistory,
+        canShowRationale: Boolean,
+        answeredInstantly: Boolean = false,
+    ): Pair<PermissionStatus, RequestHistory> {
+        val updated = AndroidStatusRules.afterRequest(
+            granted = false,
+            canShowRationale = canShowRationale,
+            history = history,
+            answeredInstantly = answeredInstantly,
+        )
         return AndroidStatusRules.status(granted = false, canShowRationale = canShowRationale, history = updated) to updated
     }
 
@@ -24,7 +33,7 @@ class AndroidStatusRulesTest {
     fun status_isGranted_whenGranted_regardlessOfHistory() {
         assertEquals(
             PermissionStatus.Granted,
-            AndroidStatusRules.status(granted = true, canShowRationale = false, history = RequestHistory(5, true)),
+            AndroidStatusRules.status(granted = true, canShowRationale = false, history = RequestHistory(true, true, true)),
         )
     }
 
@@ -44,18 +53,25 @@ class AndroidStatusRulesTest {
     }
 
     @Test
-    fun singleDismissedDialog_isDenied_notPermanentlyDenied() {
-        val (status, _) = deny(RequestHistory(), canShowRationale = false)
+    fun repeatedlyDismissedDialog_staysDenied() {
+        val (_, afterFirst) = deny(RequestHistory(), canShowRationale = false)
+        val (status, _) = deny(afterFirst, canShowRationale = false)
 
         assertEquals(PermissionStatus.Denied, status)
     }
 
     @Test
-    fun twoDenialsWithoutRationale_arePermanentlyDenied() {
-        val (_, afterFirst) = deny(RequestHistory(), canShowRationale = false)
-        val (status, _) = deny(afterFirst, canShowRationale = false)
+    fun instantDenialWithoutRationale_isPermanentlyDenied() {
+        val (status, _) = deny(RequestHistory(), canShowRationale = false, answeredInstantly = true)
 
         assertEquals(PermissionStatus.PermanentlyDenied, status)
+    }
+
+    @Test
+    fun instantDenialWithRationale_isDenied() {
+        val (status, _) = deny(RequestHistory(), canShowRationale = true, answeredInstantly = true)
+
+        assertEquals(PermissionStatus.Denied, status)
     }
 
     @Test
@@ -72,8 +88,8 @@ class AndroidStatusRulesTest {
 
     @Test
     fun observedRationale_isRemembered() {
-        val history = AndroidStatusRules.observed(granted = false, canShowRationale = true, history = RequestHistory(1, false))
+        val history = AndroidStatusRules.observed(granted = false, canShowRationale = true, history = RequestHistory(requested = true))
 
-        assertEquals(RequestHistory(1, true), history)
+        assertEquals(RequestHistory(requested = true, rationaleSeen = true), history)
     }
 }

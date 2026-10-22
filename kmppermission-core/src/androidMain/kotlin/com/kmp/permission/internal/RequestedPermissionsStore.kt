@@ -3,12 +3,14 @@ package com.kmp.permission.internal
 import android.content.Context
 import com.kmp.permission.Permission
 
-/** What the library has observed about past requests for one [Permission]. */
+/** What the library has observed about past requests for one [Permission] since it was last granted. */
 internal data class RequestHistory(
-    /** Completed requests that ended without a grant since the permission was last seen granted. */
-    val deniedCount: Int = 0,
-    /** Whether `shouldShowRequestPermissionRationale` has returned `true` since then. */
+    /** A request completed without a grant. */
+    val requested: Boolean = false,
+    /** `shouldShowRequestPermissionRationale` returned `true`, so the user has denied it before. */
     val rationaleSeen: Boolean = false,
+    /** A request was answered by the system without showing a dialog. */
+    val autoDenied: Boolean = false,
 )
 
 /**
@@ -25,26 +27,40 @@ internal class RequestedPermissionsStore(context: Context) {
 
     private val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun history(permission: Permission): RequestHistory {
+    /** Applies [transform] to [permission]'s history atomically and returns the stored result. */
+    fun update(permission: Permission, transform: (RequestHistory) -> RequestHistory): RequestHistory =
+        synchronized(LOCK) {
+            val current = read(permission)
+            val updated = transform(current)
+            if (updated != current) write(permission, updated)
+            updated
+        }
+
+    private fun read(permission: Permission): RequestHistory {
         val id = PermissionMapper.stableId(permission)
         return RequestHistory(
-            deniedCount = prefs.getInt("$id$DENIED_COUNT_SUFFIX", 0),
+            requested = prefs.getBoolean("$id$REQUESTED_SUFFIX", false),
             rationaleSeen = prefs.getBoolean("$id$RATIONALE_SEEN_SUFFIX", false),
+            autoDenied = prefs.getBoolean("$id$AUTO_DENIED_SUFFIX", false),
         )
     }
 
-    fun save(permission: Permission, history: RequestHistory) {
-        if (history == history(permission)) return
+    private fun write(permission: Permission, history: RequestHistory) {
         val id = PermissionMapper.stableId(permission)
         prefs.edit()
-            .putInt("$id$DENIED_COUNT_SUFFIX", history.deniedCount)
+            .putBoolean("$id$REQUESTED_SUFFIX", history.requested)
             .putBoolean("$id$RATIONALE_SEEN_SUFFIX", history.rationaleSeen)
+            .putBoolean("$id$AUTO_DENIED_SUFFIX", history.autoDenied)
             .apply()
     }
 
     companion object {
         const val PREFS_NAME = "com.kmp.permission.requested_permissions"
-        private const val DENIED_COUNT_SUFFIX = ".denied_count"
+        private const val REQUESTED_SUFFIX = ".requested"
         private const val RATIONALE_SEEN_SUFFIX = ".rationale_seen"
+        private const val AUTO_DENIED_SUFFIX = ".auto_denied"
+
+        // Shared by every store instance: managers bound to different Activities use the same file.
+        private val LOCK = Any()
     }
 }

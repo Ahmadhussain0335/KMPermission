@@ -3,6 +3,7 @@ package com.kmp.permission.internal
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.SystemClock
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -14,6 +15,7 @@ import com.kmp.permission.Permission
 import com.kmp.permission.PermissionException
 import com.kmp.permission.PermissionStatus
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +37,8 @@ import kotlin.coroutines.resume
  */
 internal actual class PermissionController actual constructor() : PermissionEngine {
 
+    // Written on main, read from status() on any thread.
+    @Volatile
     private var host: Host? = null
 
     private class Host(val activity: ComponentActivity, val launcher: ActivityResultLauncher<Array<String>>) {
@@ -115,20 +119,24 @@ internal actual class PermissionController actual constructor() : PermissionEngi
 
         requestMutex.withLock {
             if (together.isNotEmpty()) {
-                launchAndAwait(activeHost, requestArray(activity, together))
-                together.forEach { results[it] = activeHost.resolver.resolveAfterRequest(it, activity) }
+                val instant = launchAndAwait(activeHost, requestArray(activity, together))
+                together.forEach { results[it] = activeHost.resolver.resolveAfterRequest(it, activity, instant) }
             }
             separate.forEach { permission ->
                 // Background location is only offered once foreground location is granted, so ask
                 // for that first, as iOS does with "When In Use" before "Always".
+                var foregroundInstant = false
                 if (!hasForegroundLocation(activity)) {
-                    launchAndAwait(activeHost, foregroundLocationRequest(activity, permission))
+                    foregroundInstant = launchAndAwait(activeHost, foregroundLocationRequest(activity, permission))
                 }
                 results[permission] = if (hasForegroundLocation(activity)) {
-                    launchAndAwait(activeHost, requestArray(activity, listOf(permission)))
-                    activeHost.resolver.resolveAfterRequest(permission, activity)
+                    val instant = launchAndAwait(activeHost, requestArray(activity, listOf(permission)))
+                    activeHost.resolver.resolveAfterRequest(permission, activity, instant)
                 } else {
-                    activeHost.resolver.resolve(permission, activity)
+                    // Foreground location was refused, so background location cannot be granted;
+                    // report how the foreground request ended.
+                    val foreground = activeHost.resolver.resolveAfterRequest(foregroundLocationPermission(activity), activity, foregroundInstant)
+                    if (foreground == PermissionStatus.PermanentlyDenied) PermissionStatus.PermanentlyDenied else PermissionStatus.Denied
                 }
             }
         }
@@ -156,12 +164,25 @@ internal actual class PermissionController actual constructor() : PermissionEngi
         return declared.toTypedArray()
     }
 
-    private suspend fun launchAndAwait(host: Host, manifestPermissions: Array<String>) {
+    /** The foreground location [Permission] whose manifest entries [foregroundLocationRequest] asked for. */
+    private fun foregroundLocationPermission(activity: ComponentActivity): Permission =
+        if (ManifestPermissionChecker.isDeclared(activity, AndroidPermissionMapper.foregroundLocationPermissions.first())) {
+            Permission.LocationFine
+        } else {
+            Permission.LocationCoarse
+        }
+
+    /** @return whether the result arrived too quickly for a dialog to have been answered. */
+    private suspend fun launchAndAwait(host: Host, manifestPermissions: Array<String>): Boolean {
+        // The Activity may have been destroyed between two launches of one request.
+        if (this.host !== host) throw CancellationException("Host Activity was destroyed during the request.")
+        val startedAt = SystemClock.elapsedRealtime()
         suspendCancellableCoroutine { continuation ->
             host.pendingContinuation = continuation
             continuation.invokeOnCancellation { host.pendingContinuation = null }
             host.launcher.launch(manifestPermissions)
         }
+        return SystemClock.elapsedRealtime() - startedAt < AndroidStatusRules.AUTO_DENY_THRESHOLD_MS
     }
 
     actual override val foregroundEvents: Flow<Unit>
@@ -171,6 +192,11 @@ internal actual class PermissionController actual constructor() : PermissionEngi
         val observer = object : DefaultLifecycleObserver {
             override fun onResume(owner: LifecycleOwner) {
                 trySend(Unit)
+            }
+
+            // Ends collection so a collector outliving the Activity (a ViewModel, say) doesn't keep it alive.
+            override fun onDestroy(owner: LifecycleOwner) {
+                this@callbackFlow.close()
             }
         }
         activity.lifecycle.addObserver(observer)

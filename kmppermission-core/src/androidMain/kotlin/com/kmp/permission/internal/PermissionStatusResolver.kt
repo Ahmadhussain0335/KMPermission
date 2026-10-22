@@ -22,9 +22,16 @@ internal class PermissionStatusResolver(
     fun resolve(permission: Permission, activity: ComponentActivity?): PermissionStatus =
         resolve(permission, activity, AndroidStatusRules::observed)
 
-    /** Records that a request for [permission] just completed, then resolves its status. */
-    fun resolveAfterRequest(permission: Permission, activity: ComponentActivity): PermissionStatus =
-        resolve(permission, activity, AndroidStatusRules::afterRequest)
+    /**
+     * Records that a request for [permission] just completed, then resolves its status.
+     *
+     * @param answeredInstantly whether the result came back faster than
+     *   [AndroidStatusRules.AUTO_DENY_THRESHOLD_MS], i.e. without a dialog being answered.
+     */
+    fun resolveAfterRequest(permission: Permission, activity: ComponentActivity, answeredInstantly: Boolean): PermissionStatus =
+        resolve(permission, activity) { granted, canShowRationale, history ->
+            AndroidStatusRules.afterRequest(granted, canShowRationale, history, answeredInstantly)
+        }
 
     private fun resolve(
         permission: Permission,
@@ -46,8 +53,7 @@ internal class PermissionStatusResolver(
         val canShowRationale = canShowRationale(permission, activity)
 
         // A partial grant behaves like a grant for history: the system will prompt again to widen it.
-        val history = updateHistory(fullyGranted || partiallyGranted, canShowRationale, requestedStore.history(permission))
-        requestedStore.save(permission, history)
+        val history = requestedStore.update(permission) { updateHistory(fullyGranted || partiallyGranted, canShowRationale, it) }
 
         return if (partiallyGranted) {
             PermissionStatus.Limited

@@ -8,14 +8,19 @@ import com.kmp.permission.PermissionStatus
  */
 internal object AndroidStatusRules {
 
+    /**
+     * A result faster than this cannot have come from a person answering a dialog, so the system
+     * refused without showing one.
+     */
+    const val AUTO_DENY_THRESHOLD_MS = 500L
+
     fun status(granted: Boolean, canShowRationale: Boolean, history: RequestHistory): PermissionStatus = when {
         granted -> PermissionStatus.Granted
         canShowRationale -> PermissionStatus.Denied
-        // Android only stops prompting after a denial that followed a rationale-eligible one, or
-        // after two denials on Android 11+.
-        history.rationaleSeen || history.deniedCount >= 2 -> PermissionStatus.PermanentlyDenied
-        history.deniedCount == 0 -> PermissionStatus.NotDetermined
-        // A single denial with no rationale is a dismissed dialog: the prompt will show again.
+        // Rationale stops being offered after the denial that follows a rationale-eligible one.
+        history.rationaleSeen || history.autoDenied -> PermissionStatus.PermanentlyDenied
+        !history.requested -> PermissionStatus.NotDetermined
+        // Denied without ever offering a rationale: a dismissed dialog, which will show again.
         else -> PermissionStatus.Denied
     }
 
@@ -29,13 +34,19 @@ internal object AndroidStatusRules {
     }
 
     /** History to store once a request for the permission has completed. */
-    fun afterRequest(granted: Boolean, canShowRationale: Boolean, history: RequestHistory): RequestHistory =
+    fun afterRequest(
+        granted: Boolean,
+        canShowRationale: Boolean,
+        history: RequestHistory,
+        answeredInstantly: Boolean,
+    ): RequestHistory =
         if (granted) {
             RequestHistory()
         } else {
             RequestHistory(
-                deniedCount = history.deniedCount + 1,
+                requested = true,
                 rationaleSeen = history.rationaleSeen || canShowRationale,
+                autoDenied = history.autoDenied || (answeredInstantly && !canShowRationale),
             )
         }
 }

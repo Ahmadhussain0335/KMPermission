@@ -101,7 +101,8 @@ internal object AndroidPermissionMapper {
 
     /**
      * True if [permission] has to be requested on its own, after foreground location is granted.
-     * From API 30 a request that mixes it with other permissions is ignored by the system.
+     * From API 29 background location is granted separately; from API 30 the system ignores a
+     * request that mixes it with foreground location.
      */
     fun requiresSeparateRequest(permission: Permission, sdkInt: Int = Build.VERSION.SDK_INT): Boolean =
         permission == Permission.LocationBackground && sdkInt >= Build.VERSION_CODES.Q
