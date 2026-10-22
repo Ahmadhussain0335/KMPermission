@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
+    alias(libs.plugins.mavenPublish)
 }
 
 kotlin {
@@ -56,5 +57,16 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.androidx.core.ktx)
         }
+    }
+}
+
+// Group, version, license, developer and SCM details come from the root gradle.properties.
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates(artifactId = "kmppermission-core")
+    pom {
+        name.set("KMPermission Core")
+        description.set("Kotlin Multiplatform runtime permissions for Android and iOS: check, request and observe permissions through one API.")
     }
 }

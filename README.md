@@ -18,7 +18,26 @@ A Kotlin Multiplatform library for checking, requesting and observing runtime pe
 | `sample-android` | Compose sample app. |
 | `sample-ios` | SwiftUI sample app using `KMPPermissionCore` (open `sample-ios/iosApp.xcodeproj`). |
 
-The library supports Android 8.0 (API 26) and later and iOS 15 and later. It is not published to a repository yet; include the modules from source.
+The library supports Android 8.0 (API 26) and later and iOS 15 and later.
+
+## Installation
+
+The libraries are set up for Maven Central under the group `io.github.ahmadhussain0335`. The first Maven Central release (0.2.0) is pending; until then, include the modules from source.
+
+```kotlin
+// build.gradle.kts of a Kotlin Multiplatform module
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.github.ahmadhussain0335:kmppermission-core:0.2.0")
+            // Optional Compose Multiplatform layer
+            implementation("io.github.ahmadhussain0335:kmppermission-compose:0.2.0")
+        }
+    }
+}
+```
+
+Android-only apps can use the same coordinates in `dependencies { }`; Gradle picks the Android artifact.
 
 ## Statuses
 
@@ -157,7 +176,7 @@ With a free Personal Team, trust the developer certificate on the device first (
 
 ## Project status
 
-Version 0.1.0. Not yet published; the API may still change before 1.0.
+Version 0.1.0 is tagged on GitHub; 0.2.0 will be the first Maven Central release. The API may still change before 1.0.
 
 Tested on real devices:
 - Samsung Galaxy A53 (Android 16): denial and permanent denial, dismissed dialogs, approximate then precise location, the background-location sequence, selected photos, the Bluetooth and Nearby Wi-Fi group, notifications, contacts, calendar, changes made in Settings, and rotation during a dialog.
@@ -174,6 +193,21 @@ Planned:
 - Publishing to Maven Central, optionally with an XCFramework or Swift package for Swift-only iOS apps.
 - An instrumented Android UI test suite matching the iOS one, plus Compose and Robolectric tests.
 - A Compose sample for iOS.
+
+## Releasing
+
+Pushing a tag `vX.Y.Z` runs `.github/workflows/publish.yml` on macOS. It runs the tests and the ABI check, then signs and uploads the version from the tag to Maven Central. The deployment then waits in the [Central Portal](https://central.sonatype.com/publishing/deployments) for a manual Publish.
+
+Before the first release, the repository needs these Actions secrets (Settings, then Secrets and variables, then Actions):
+
+| Secret | Value |
+|---|---|
+| `MAVEN_CENTRAL_USERNAME` | User token username from the Central Portal (Account, then Generate User Token) |
+| `MAVEN_CENTRAL_PASSWORD` | User token password |
+| `SIGNING_KEY` | ASCII-armored GPG private key (`gpg --export-secret-keys --armor <key id>`) |
+| `SIGNING_KEY_PASSWORD` | Passphrase of that key |
+
+The public half of the key must be uploaded to a keyserver such as `keys.openpgp.org` so Maven Central can verify the signatures. Secrets never go into the repository or `gradle.properties`.
 
 ## License
 

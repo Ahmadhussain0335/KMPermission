@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
+    alias(libs.plugins.mavenPublish)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
@@ -46,5 +47,16 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+    }
+}
+
+// Group, version, license, developer and SCM details come from the root gradle.properties.
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates(artifactId = "kmppermission-compose")
+    pom {
+        name.set("KMPermission Compose")
+        description.set("Compose Multiplatform state holders and effects for KMPermission.")
     }
 }
