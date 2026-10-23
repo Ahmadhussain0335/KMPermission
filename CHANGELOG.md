@@ -2,7 +2,7 @@
 
 All notable changes to KMPermission. The Maven coordinates (`io.github.ahmadhussain0335:kmppermission-core` and `kmppermission-compose`), the iOS framework name (`KMPPermissionCore`) and the Swift package product (`KMPPermissionCore`) have not changed between versions.
 
-## 0.3.0 (unreleased)
+## 0.3.0 (2026-10-23)
 
 ### Breaking changes
 

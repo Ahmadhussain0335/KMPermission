@@ -221,7 +221,7 @@ With a free Personal Team, trust the developer certificate on the device first (
 
 ## Project status
 
-The latest release is 0.2.1, available on Maven Central and as a Swift package. The API may still change before 1.0.
+The latest release is 0.3.0, available on Maven Central and as a Swift package. The API may still change before 1.0.
 
 Tested on real devices:
 - Samsung Galaxy A53 (Android 16): denial and permanent denial, dismissed dialogs, approximate then precise location, the background-location sequence, selected photos, the Bluetooth and Nearby Wi-Fi group, notifications, contacts, calendar, changes made in Settings, and rotation during a dialog.
