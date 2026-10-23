@@ -11,8 +11,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "KMPPermissionCore",
-            url: "https://github.com/Ahmadhussain0335/KMPermission/releases/download/v0.2.1/KMPPermissionCore.xcframework.zip",
-            checksum: "2015f87c7b757fee72d693ec963a14eb0d538e36d0951cfe084581c8dca8d276"
+            url: "https://github.com/Ahmadhussain0335/KMPermission/releases/download/v0.3.0/KMPPermissionCore.xcframework.zip",
+            checksum: "4d22891068c4b48234268aaf0c6f3c14f3408c79c7ae55c67bc77a165355ebc8"
         ),
     ]
 )
