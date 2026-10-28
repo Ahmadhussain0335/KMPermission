@@ -1,0 +1,102 @@
+name: Upload release-agent-skills (temporary)
+
+# One-off: uploads io.github.ahmadhussain0335:release-agent-skills:0.1.2 to the Central Portal as a
+# USER_MANAGED deployment, signed with this repository's existing secrets. Runs only on a push to
+# this temporary branch. Nothing is released: Publish or Drop it at
+# https://central.sonatype.com/publishing/deployments. Delete this branch afterwards.
+on:
+  push:
+    branches: [tmp/publish-release-agent-skills]
+
+permissions:
+  contents: read
+
+env:
+  GROUP: io.github.ahmadhussain0335
+  ARTIFACT: release-agent-skills
+  VERSION: 0.1.2
+  REPO: build/maven-repo
+  SCRIPTS: skills/release-maven/scripts
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Ahmadhussain0335/release-agent-skills
+          ref: d163b1455d651330ad24c8c229f5b68cca75a72f
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+
+      - name: Tests
+        run: npm test
+
+      - name: Check the version is not on Maven Central
+        run: node "$SCRIPTS/check-version.mjs" --group "$GROUP" --artifact "$ARTIFACT" --version "$VERSION"
+
+      - name: Build artifacts
+        run: node tools/maven/build.mjs --out "$REPO" --version "$VERSION"
+
+      # SIGNING_KEY is the armored key used by vanniktech's signingInMemoryKey. Accept it with real
+      # line breaks or with literal \n escapes.
+      - name: Sign
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          export GNUPGHOME="$(mktemp -d)"
+          echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+          if [[ "$SIGNING_KEY" == *$'\n'* ]]; then printf '%s\n' "$SIGNING_KEY"; else printf '%b\n' "$SIGNING_KEY"; fi | gpg --batch --quiet --import
+          find "$REPO" -type f ! -name '*.asc' -print0 | while IFS= read -r -d '' f; do
+            printf '%s' "$SIGNING_KEY_PASSWORD" | gpg --batch --yes --quiet --pinentry-mode loopback \
+              --passphrase-fd 0 --armor --detach-sign "$f"
+          done
+
+      - name: Check artifacts, POM and signatures
+        run: |
+          node "$SCRIPTS/inspect-artifacts.mjs" --repo "$REPO" --group "$GROUP" --version "$VERSION" --expect "$ARTIFACT"
+          node "$SCRIPTS/validate-pom.mjs" --repo "$REPO" --version "$VERSION"
+          node "$SCRIPTS/verify-signatures.mjs" --repo "$REPO" --version "$VERSION"
+
+      - name: Upload to the Central Portal (USER_MANAGED, not released)
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          set +e
+          node "$SCRIPTS/portal.mjs" upload --repo "$REPO" --group "$GROUP" --version "$VERSION" \
+            --name "$GROUP:$ARTIFACT:$VERSION" --type user_managed > upload.json
+          status=$?
+          cat upload.json
+          [ $status -eq 0 ] || exit $status
+          echo "DEPLOYMENT_ID=$(node -p 'require("./upload.json").data.deploymentId')" >> "$GITHUB_ENV"
+
+      - name: Wait for validation
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          for attempt in 1 2 3 4; do
+            node "$SCRIPTS/portal.mjs" status --id "$DEPLOYMENT_ID" --wait > status.json
+            state=$(node -p 'require("./status.json").data?.state ?? "unknown"')
+            echo "Attempt $attempt: $state"
+            case "$state" in VALIDATED|FAILED|PUBLISHING|PUBLISHED) break ;; esac
+          done
+          cat status.json
+          [ "$state" = VALIDATED ]
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### $GROUP:$ARTIFACT:$VERSION"
+            echo
+            echo "- Deployment ID: \`${DEPLOYMENT_ID:-none}\`"
+            echo "- State: \`$(node -p 'try { require("./status.json").data.state } catch { "not reached" }')\`"
+            echo
+            echo "Nothing has been released. Publish or Drop at https://central.sonatype.com/publishing/deployments. Publishing is permanent."
+          } >> "$GITHUB_STEP_SUMMARY"
